@@ -37,3 +37,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### 应用程序数据 ###
+data/
+*.db
