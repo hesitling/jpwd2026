@@ -100,7 +100,7 @@
 ## 12. 测试和优化
 
 - [x] 12.1 编写CryptoService单元测试（加密解密一致性、边界条件）
-- [ ] 12.2 编写PasswordGenerator单元测试（生成策略、强度评估）
+- [x] 12.2 编写PasswordGenerator单元测试（生成策略、强度评估）
 - [ ] 12.3 编写CsvHandler单元测试（特殊字符处理、编码问题）
 - [ ] 12.4 编写SessionManager单元测试（超时逻辑）
 - [x] 12.5 编写Repository层单元测试（CRUD操作、查询）
