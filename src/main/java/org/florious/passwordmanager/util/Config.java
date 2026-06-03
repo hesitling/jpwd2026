@@ -18,7 +18,7 @@ import java.util.Properties;
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final String CONFIG_FILE = "config.properties";
-    private static final String APP_DIR = ".password-manager";
+    private static final String APP_DIR = ".config/jpwd";
     private static Properties properties;
     private static Path configPath;
 
