@@ -42,12 +42,12 @@
 
 ## 6. 密码生成
 
-- [ ] 6.1 实现PasswordGenerator类，包含generate方法（根据策略生成密码）
-- [ ] 6.2 实现PasswordPolicy类（长度、字符类型配置）
-- [ ] 6.3 实现PasswordStrength枚举（WEAK、MEDIUM、STRONG、VERY_STRONG）
-- [ ] 6.4 实现checkStrength方法（密码强度评估算法）
-- [ ] 6.5 实现密码生成器界面PasswordGeneratorDialog
-- [ ] 6.6 实现强度指示器组件StrengthMeter
+- [x] 6.1 实现PasswordGenerator类，包含generate方法（根据策略生成密码）
+- [x] 6.2 实现PasswordPolicy类（长度、字符类型配置）
+- [x] 6.3 实现PasswordStrength枚举（WEAK、MEDIUM、STRONG、VERY_STRONG）
+- [x] 6.4 实现checkStrength方法（密码强度评估算法）
+- [x] 6.5 实现密码生成器界面PasswordGeneratorDialog
+- [x] 6.6 实现强度指示器组件StrengthMeter
 
 ## 7. 分类管理
 
@@ -100,7 +100,7 @@
 ## 12. 测试和优化
 
 - [x] 12.1 编写CryptoService单元测试（加密解密一致性、边界条件）
-- [ ] 12.2 编写PasswordGenerator单元测试（生成策略、强度评估）
+- [x] 12.2 编写PasswordGenerator单元测试（生成策略、强度评估）
 - [ ] 12.3 编写CsvHandler单元测试（特殊字符处理、编码问题）
 - [ ] 12.4 编写SessionManager单元测试（超时逻辑）
 - [x] 12.5 编写Repository层单元测试（CRUD操作、查询）
