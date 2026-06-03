@@ -18,10 +18,14 @@ import java.util.Properties;
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final String CONFIG_FILE = "config.properties";
+    private static final String APP_DIR = ".password-manager";
     private static Properties properties;
     private static Path configPath;
 
     static {
+        // 配置文件路径：用户目录/.password-manager/config.properties
+        String userHome = System.getProperty("user.home");
+        configPath = Paths.get(userHome, APP_DIR, CONFIG_FILE);
         load();
     }
 
@@ -30,7 +34,16 @@ public class Config {
      */
     public static void load() {
         properties = new Properties();
-        configPath = Paths.get(CONFIG_FILE);
+
+        // 确保配置目录存在
+        try {
+            Path parentDir = configPath.getParent();
+            if (parentDir != null && !Files.exists(parentDir)) {
+                Files.createDirectories(parentDir);
+            }
+        } catch (IOException e) {
+            logger.warn("无法创建配置目录: {}", configPath.getParent(), e);
+        }
 
         // 首先尝试从类路径加载默认配置
         try (InputStream input = Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
