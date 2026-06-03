@@ -160,7 +160,7 @@ public class PasswordEntry {
         if (o == null || getClass() != o.getClass()) return false;
         PasswordEntry that = (PasswordEntry) o;
         return id == that.id && userId == that.userId && 
-               title.equals(that.title);
+               java.util.Objects.equals(title, that.title);
     }
 
     @Override

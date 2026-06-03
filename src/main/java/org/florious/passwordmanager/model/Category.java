@@ -88,7 +88,7 @@ public class Category {
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
         return id == category.id && userId == category.userId && 
-               name.equals(category.name);
+               java.util.Objects.equals(name, category.name);
     }
 
     @Override

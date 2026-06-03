@@ -98,7 +98,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && username.equals(user.username);
+        return id == user.id && java.util.Objects.equals(username, user.username);
     }
 
     @Override
