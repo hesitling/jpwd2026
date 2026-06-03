@@ -55,8 +55,15 @@ public class Config {
      * 保存配置到文件
      */
     public static void save() {
-        try (OutputStream output = Files.newOutputStream(configPath)) {
-            properties.store(output, "密码管理器配置文件");
+        try {
+            // 确保父目录存在
+            Path parentDir = configPath.getParent();
+            if (parentDir != null && !Files.exists(parentDir)) {
+                Files.createDirectories(parentDir);
+            }
+            try (OutputStream output = Files.newOutputStream(configPath)) {
+                properties.store(output, "密码管理器配置文件");
+            }
         } catch (IOException e) {
             logger.error("无法保存配置文件: {}", configPath, e);
         }

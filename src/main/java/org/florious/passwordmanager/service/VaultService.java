@@ -125,7 +125,7 @@ public class VaultService {
                                         String plainPassword, String url, String notes,
                                         Integer categoryId) throws VaultException {
         // 验证输入
-        if (title == null || title.isEmpty()) {
+        if (title == null || title.trim().isEmpty()) {
             throw new VaultException("标题不能为空");
         }
 
