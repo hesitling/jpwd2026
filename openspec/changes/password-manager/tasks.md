@@ -1,19 +1,19 @@
 ## 1. 项目设置和基础设施
 
-- [ ] 1.1 更新pom.xml添加依赖：password4j、SQLite JDBC
-- [ ] 1.2 创建项目包结构：ui、service、repository、model、crypto、util
-- [ ] 1.3 创建配置文件config.properties和配置管理类Config
-- [ ] 1.4 创建数据库管理类DatabaseManager，实现数据库初始化
+- [x] 1.1 更新pom.xml添加依赖：password4j、SQLite JDBC
+- [x] 1.2 创建项目包结构：ui、service、repository、model、crypto、util
+- [x] 1.3 创建配置文件config.properties和配置管理类Config
+- [x] 1.4 创建数据库管理类DatabaseManager，实现数据库初始化
 
 ## 2. 数据模型和数据库
 
-- [ ] 2.1 创建User模型类（id、username、passwordHash、salt、createdAt、lastLogin）
-- [ ] 2.2 创建PasswordEntry模型类（id、userId、title、username、encryptedPassword、iv、url、notes、categoryId、createdAt、updatedAt）
-- [ ] 2.3 创建Category模型类（id、userId、name、color）
-- [ ] 2.4 创建数据库表结构SQL脚本（users、password_entries、categories）
-- [ ] 2.5 实现UserRepository类（CRUD操作、按用户名查询）
-- [ ] 2.6 实现PasswordRepository类（CRUD操作、搜索、按分类过滤）
-- [ ] 2.7 实现CategoryRepository类（CRUD操作、按用户查询）
+- [x] 2.1 创建User模型类（id、username、passwordHash、salt、createdAt、lastLogin）
+- [x] 2.2 创建PasswordEntry模型类（id、userId、title、username、encryptedPassword、iv、url、notes、categoryId、createdAt、updatedAt）
+- [x] 2.3 创建Category模型类（id、userId、name、color）
+- [x] 2.4 创建数据库表结构SQL脚本（users、password_entries、categories）
+- [x] 2.5 实现UserRepository类（CRUD操作、按用户名查询）
+- [x] 2.6 实现PasswordRepository类（CRUD操作、搜索、按分类过滤）
+- [x] 2.7 实现CategoryRepository类（CRUD操作、按用户查询）
 
 ## 3. 加密服务
 
