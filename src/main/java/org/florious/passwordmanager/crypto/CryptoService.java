@@ -9,6 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -132,7 +133,7 @@ public class CryptoService {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec);
 
             // 加密
-            byte[] encrypted = cipher.doFinal(plainPassword.getBytes());
+            byte[] encrypted = cipher.doFinal(plainPassword.getBytes(StandardCharsets.UTF_8));
 
             // 组合IV和密文
             byte[] combined = new byte[iv.length + encrypted.length];
@@ -182,7 +183,7 @@ public class CryptoService {
             // 解密
             byte[] decrypted = cipher.doFinal(encrypted);
 
-            return new String(decrypted);
+            return new String(decrypted, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new CryptoException("AES-GCM-256解密失败: " + e.getMessage(), e);
         }
