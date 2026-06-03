@@ -74,7 +74,8 @@ public class AuthService {
             // 查找用户
             User user = userRepository.findByUsername(username);
             if (user == null) {
-                throw new AuthException("用户不存在");
+                // 统一错误消息防止用户名枚举
+                throw new AuthException("用户名或密码错误");
             }
 
             // 验证密码
@@ -85,7 +86,8 @@ public class AuthService {
             );
 
             if (!passwordValid) {
-                throw new AuthException("密码错误");
+                // 统一错误消息防止用户名枚举
+                throw new AuthException("用户名或密码错误");
             }
 
             // 更新最后登录时间

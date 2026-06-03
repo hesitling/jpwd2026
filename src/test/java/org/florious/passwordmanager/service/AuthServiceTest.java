@@ -198,7 +198,7 @@ class AuthServiceTest {
             AuthService.AuthException exception = assertThrows(AuthService.AuthException.class, () -> {
                 authService.login(username, password);
             });
-            assertTrue(exception.getMessage().contains("用户不存在"));
+            assertTrue(exception.getMessage().contains("用户名或密码错误"));
         }
 
         @Test
