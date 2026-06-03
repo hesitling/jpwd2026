@@ -195,7 +195,7 @@ public class VaultService {
     /**
      * 搜索密码条目
      * @param query 搜索关键词
-     * @return 匹配的密码条目列表（密码字段为掩码）
+     * @return 匹配的密码条目列表（密码字段为加密存储）
      * @throws VaultException 如果搜索失败
      */
     public List<PasswordEntry> searchPasswords(String query) throws VaultException {
@@ -214,7 +214,7 @@ public class VaultService {
 
     /**
      * 获取所有密码条目
-     * @return 当前用户的所有密码条目（密码字段为掩码）
+     * @return 当前用户的所有密码条目（密码字段为加密存储）
      * @throws VaultException 如果获取失败
      */
     public List<PasswordEntry> getAllPasswords() throws VaultException {
