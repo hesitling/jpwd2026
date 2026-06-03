@@ -18,9 +18,17 @@ public class VaultService {
     private final SessionManager sessionManager;
 
     public VaultService() {
+        this(false);
+    }
+
+    /**
+     * 创建 VaultService
+     * @param testMode 测试模式下使用轻量级加密参数
+     */
+    public VaultService(boolean testMode) {
         this.passwordRepository = new PasswordRepository();
-        this.cryptoService = new CryptoService();
-        this.sessionManager = SessionManager.getInstance();
+        this.cryptoService = new CryptoService(testMode);
+        this.sessionManager = SessionManager.getInstance(testMode);
     }
 
     /**

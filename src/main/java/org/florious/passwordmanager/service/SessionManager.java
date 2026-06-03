@@ -24,7 +24,11 @@ public class SessionManager {
     private static final int TIMEOUT_CHECK_INTERVAL = 30000; // 30秒
 
     private SessionManager() {
-        this.cryptoService = new CryptoService();
+        this(false);
+    }
+
+    private SessionManager(boolean testMode) {
+        this.cryptoService = new CryptoService(testMode);
         this.listeners = new CopyOnWriteArrayList<>();
     }
 
@@ -37,6 +41,28 @@ public class SessionManager {
             instance = new SessionManager();
         }
         return instance;
+    }
+
+    /**
+     * 获取单例实例（测试模式）
+     * @param testMode 是否使用测试模式
+     * @return SessionManager实例
+     */
+    public static synchronized SessionManager getInstance(boolean testMode) {
+        if (instance == null) {
+            instance = new SessionManager(testMode);
+        }
+        return instance;
+    }
+
+    /**
+     * 重置单例实例（用于测试清理）
+     */
+    public static synchronized void resetInstance() {
+        if (instance != null) {
+            instance.destroySession();
+            instance = null;
+        }
     }
 
     /**

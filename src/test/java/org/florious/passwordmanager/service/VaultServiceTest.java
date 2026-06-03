@@ -32,14 +32,16 @@ class VaultServiceTest {
 
     @AfterAll
     static void tearDownClass() {
-        // 重置数据库实例
+        // 重置数据库和会话管理器实例
+        SessionManager.resetInstance();
         DatabaseManager.resetInstance();
     }
 
     @BeforeEach
     void setUp() throws AuthService.AuthException {
-        authService = new AuthService();
-        vaultService = new VaultService();
+        // 使用测试模式（轻量级 Argon2 参数）
+        authService = new AuthService(true);
+        vaultService = new VaultService(true);
         userRepository = new UserRepository();
         passwordRepository = new PasswordRepository();
 

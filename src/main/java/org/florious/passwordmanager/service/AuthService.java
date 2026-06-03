@@ -16,9 +16,17 @@ public class AuthService {
     private final SessionManager sessionManager;
 
     public AuthService() {
+        this(false);
+    }
+
+    /**
+     * 创建 AuthService
+     * @param testMode 测试模式下使用轻量级加密参数
+     */
+    public AuthService(boolean testMode) {
         this.userRepository = new UserRepository();
-        this.cryptoService = new CryptoService();
-        this.sessionManager = SessionManager.getInstance();
+        this.cryptoService = new CryptoService(testMode);
+        this.sessionManager = SessionManager.getInstance(testMode);
     }
 
     /**

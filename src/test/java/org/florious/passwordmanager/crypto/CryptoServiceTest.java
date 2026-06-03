@@ -17,7 +17,8 @@ class CryptoServiceTest {
 
     @BeforeEach
     void setUp() {
-        cryptoService = new CryptoService();
+        // 使用测试模式加速（轻量级 Argon2 参数）
+        cryptoService = new CryptoService(true);
     }
 
     @Nested

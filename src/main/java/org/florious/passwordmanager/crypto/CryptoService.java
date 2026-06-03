@@ -26,15 +26,37 @@ public class CryptoService {
     private static final int SALT_LENGTH = 16;
 
     // Argon2id 配置
-    private static final int ARGON2_MEMORY = 65536; // 64 MB
-    private static final int ARGON2_ITERATIONS = 3;
-    private static final int ARGON2_PARALLELISM = 1;
+    private final int argon2Memory;
+    private final int argon2Iterations;
+    private final int argon2Parallelism;
     private static final int ARGON2_HASH_LENGTH = 32;
 
     private final SecureRandom secureRandom;
 
+    /**
+     * 创建 CryptoService（生产模式）
+     */
     public CryptoService() {
+        this(false);
+    }
+
+    /**
+     * 创建 CryptoService
+     * @param testMode 测试模式下使用轻量级参数，加快哈希速度
+     */
+    public CryptoService(boolean testMode) {
         this.secureRandom = new SecureRandom();
+        if (testMode) {
+            // 测试模式：轻量级参数（约 10-50ms）
+            this.argon2Memory = 1024;    // 1 MB
+            this.argon2Iterations = 1;
+            this.argon2Parallelism = 1;
+        } else {
+            // 生产模式：安全参数（约 1-2s）
+            this.argon2Memory = 65536;   // 64 MB
+            this.argon2Iterations = 3;
+            this.argon2Parallelism = 1;
+        }
     }
 
     // ==================== Argon2id 哈希方法 ====================
@@ -56,9 +78,9 @@ public class CryptoService {
         try {
             // 创建Argon2id函数
             Argon2Function argon2 = Argon2Function.getInstance(
-                    ARGON2_MEMORY,
-                    ARGON2_ITERATIONS,
-                    ARGON2_PARALLELISM,
+                    argon2Memory,
+                    argon2Iterations,
+                    argon2Parallelism,
                     ARGON2_HASH_LENGTH,
                     Argon2.ID,  // Argon2id
                     19          // 版本19
@@ -208,9 +230,9 @@ public class CryptoService {
         try {
             // 创建Argon2id函数用于密钥派生
             Argon2Function argon2 = Argon2Function.getInstance(
-                    ARGON2_MEMORY,
-                    ARGON2_ITERATIONS,
-                    ARGON2_PARALLELISM,
+                    argon2Memory,
+                    argon2Iterations,
+                    argon2Parallelism,
                     AES_KEY_LENGTH / 8,  // 32字节
                     Argon2.ID,
                     19
