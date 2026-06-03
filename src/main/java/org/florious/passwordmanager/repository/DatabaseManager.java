@@ -1,6 +1,8 @@
 package org.florious.passwordmanager.repository;
 
 import org.florious.passwordmanager.util.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +18,7 @@ import java.sql.Statement;
  * 负责数据库连接、初始化和表结构管理
  */
 public class DatabaseManager {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
     private static DatabaseManager instance;
     private Connection connection;
     private final String dbPath;
@@ -64,16 +67,16 @@ public class DatabaseManager {
             // 创建表结构
             createTables();
 
-            System.out.println("数据库初始化成功: " + dbPath);
+            logger.info("数据库初始化成功: {}", dbPath);
 
         } catch (ClassNotFoundException e) {
-            System.err.println("错误: 未找到SQLite JDBC驱动: " + e.getMessage());
+            logger.error("未找到SQLite JDBC驱动", e);
             throw new RuntimeException("数据库驱动加载失败", e);
         } catch (SQLException e) {
-            System.err.println("错误: 数据库连接失败: " + e.getMessage());
+            logger.error("数据库连接失败: {}", dbPath, e);
             throw new RuntimeException("数据库连接失败", e);
         } catch (IOException e) {
-            System.err.println("错误: 无法创建数据库目录: " + e.getMessage());
+            logger.error("无法创建数据库目录: {}", dbPath, e);
             throw new RuntimeException("数据库目录创建失败", e);
         }
     }
@@ -170,7 +173,7 @@ public class DatabaseManager {
             try {
                 connection.close();
             } catch (SQLException e) {
-                System.err.println("警告: 关闭数据库连接时出错: " + e.getMessage());
+                logger.warn("关闭数据库连接时出错", e);
             }
         }
     }

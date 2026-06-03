@@ -1,5 +1,8 @@
 package org.florious.passwordmanager.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +16,7 @@ import java.util.Properties;
  * 负责加载、保存和管理应用程序配置
  */
 public class Config {
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final String CONFIG_FILE = "config.properties";
     private static Properties properties;
     private static Path configPath;
@@ -34,7 +38,7 @@ public class Config {
                 properties.load(input);
             }
         } catch (IOException e) {
-            System.err.println("警告: 无法加载默认配置文件: " + e.getMessage());
+            logger.warn("无法加载默认配置文件", e);
         }
 
         // 然后尝试从文件系统加载配置（覆盖默认值）
@@ -42,7 +46,7 @@ public class Config {
             try (InputStream input = Files.newInputStream(configPath)) {
                 properties.load(input);
             } catch (IOException e) {
-                System.err.println("警告: 无法加载配置文件: " + e.getMessage());
+                logger.warn("无法加载配置文件: {}", configPath, e);
             }
         }
     }
@@ -54,7 +58,7 @@ public class Config {
         try (OutputStream output = Files.newOutputStream(configPath)) {
             properties.store(output, "密码管理器配置文件");
         } catch (IOException e) {
-            System.err.println("错误: 无法保存配置文件: " + e.getMessage());
+            logger.error("无法保存配置文件: {}", configPath, e);
         }
     }
 
@@ -98,7 +102,7 @@ public class Config {
             try {
                 return Integer.parseInt(value.trim());
             } catch (NumberFormatException e) {
-                System.err.println("警告: 配置项 " + key + " 不是有效的整数: " + value);
+                logger.warn("配置项 {} 不是有效的整数: {}", key, value);
             }
         }
         return defaultValue;

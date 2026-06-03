@@ -1,6 +1,8 @@
 package org.florious.passwordmanager.repository;
 
 import org.florious.passwordmanager.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ import java.util.List;
  * 负责用户数据的CRUD操作
  */
 public class UserRepository {
+    private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
     private static final DateTimeFormatter DB_TIMESTAMP_FORMATTER = 
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
@@ -244,7 +247,7 @@ public class UserRepository {
                 try {
                     user.setCreatedAt(LocalDateTime.parse(createdAt));
                 } catch (DateTimeParseException e2) {
-                    System.err.println("警告: 无法解析 created_at 时间戳: " + createdAt);
+                    logger.warn("无法解析 created_at 时间戳: {}", createdAt);
                 }
             }
         }
@@ -258,7 +261,7 @@ public class UserRepository {
                 try {
                     user.setLastLogin(LocalDateTime.parse(lastLogin));
                 } catch (DateTimeParseException e2) {
-                    System.err.println("警告: 无法解析 last_login 时间戳: " + lastLogin);
+                    logger.warn("无法解析 last_login 时间戳: {}", lastLogin);
                 }
             }
         }
