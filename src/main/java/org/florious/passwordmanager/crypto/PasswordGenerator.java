@@ -120,75 +120,78 @@ public class PasswordGenerator {
     }
 
     /**
-     * 检查密码强度
+     * 检查密码强度（评分制）
+     * <p>
+     * 评分规则：
+     * - 长度分：8以下=0, 8-11=1, 12-15=2, 16+=3
+     * - 类型分：每种字符类型+1（最多4分）
+     * - 扣分：有重复字符-1，有连续字符-1
+     * <p>
+     * 强度映射：
+     * - 单一类型或总分 0-1: WEAK
+     * - 总分 2-3: MEDIUM
+     * - 总分 4-5: STRONG
+     * - 总分 6+: VERY_STRONG
      */
     public PasswordStrength checkStrength(String password) {
         if (password == null || password.isEmpty()) {
             return PasswordStrength.WEAK;
         }
 
+        int score = 0;
         int length = password.length();
-        boolean hasUppercase = false;
-        boolean hasLowercase = false;
-        boolean hasDigit = false;
-        boolean hasSymbol = false;
-        
-        // 统计字符类型
-        for (char c : password.toCharArray()) {
-            if (Character.isUpperCase(c)) {
-                hasUppercase = true;
-            } else if (Character.isLowerCase(c)) {
-                hasLowercase = true;
-            } else if (Character.isDigit(c)) {
-                hasDigit = true;
-            } else {
-                hasSymbol = true;
-            }
-        }
 
-        int typeCount = 0;
-        if (hasUppercase) typeCount++;
-        if (hasLowercase) typeCount++;
-        if (hasDigit) typeCount++;
-        if (hasSymbol) typeCount++;
-
-        // 检查重复字符
-        boolean hasRepeating = false;
-        for (int i = 0; i < password.length() - 1; i++) {
-            if (password.charAt(i) == password.charAt(i + 1)) {
-                hasRepeating = true;
-                break;
-            }
-        }
-
-        // 检查连续字符（如abc, 123）
-        boolean hasSequential = false;
-        for (int i = 0; i < password.length() - 2; i++) {
-            char c1 = password.charAt(i);
-            char c2 = password.charAt(i + 1);
-            char c3 = password.charAt(i + 2);
-            
-            if ((c1 + 1 == c2 && c2 + 1 == c3) || (c1 - 1 == c2 && c2 - 1 == c3)) {
-                hasSequential = true;
-                break;
-            }
-        }
-
-        // 根据规则判断强度
+        // 长度分
         if (length < 8) {
-            return PasswordStrength.WEAK;
-        } else if (length >= 8 && length <= 11 && typeCount >= 2) {
-            return PasswordStrength.MEDIUM;
-        } else if (length >= 12 && length <= 15 && typeCount >= 3) {
-            return PasswordStrength.STRONG;
-        } else if (length >= 16 && typeCount == 4 && !hasRepeating && !hasSequential) {
-            return PasswordStrength.VERY_STRONG;
-        } else if (length >= 12 && typeCount >= 2) {
-            return PasswordStrength.MEDIUM;
-        } else if (length >= 8) {
+            score += 0;
+        } else if (length <= 11) {
+            score += 1;
+        } else if (length <= 15) {
+            score += 2;
+        } else {
+            score += 3;
+        }
+
+        // 字符类型分
+        boolean hasUppercase = false, hasLowercase = false, hasDigit = false, hasSymbol = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) hasUppercase = true;
+            else if (Character.isLowerCase(c)) hasLowercase = true;
+            else if (Character.isDigit(c)) hasDigit = true;
+            else hasSymbol = true;
+        }
+        int typeCount = 0;
+        if (hasUppercase) { score++; typeCount++; }
+        if (hasLowercase) { score++; typeCount++; }
+        if (hasDigit) { score++; typeCount++; }
+        if (hasSymbol) { score++; typeCount++; }
+
+        // 单一类型直接判定为WEAK
+        if (typeCount <= 1) {
             return PasswordStrength.WEAK;
         }
-        
-        return PasswordStrength.WEAK;
+
+        // 扣分：连续重复字符
+        for (int i = 0; i < length - 1; i++) {
+            if (password.charAt(i) == password.charAt(i + 1)) {
+                score--;
+                break;
+            }
+        }
+
+        // 扣分：连续序列（abc, 123）
+        for (int i = 0; i < length - 2; i++) {
+            char c1 = password.charAt(i), c2 = password.charAt(i + 1), c3 = password.charAt(i + 2);
+            if ((c1 + 1 == c2 && c2 + 1 == c3) || (c1 - 1 == c2 && c2 - 1 == c3)) {
+                score--;
+                break;
+            }
+        }
+
+        // 映射到强度等级
+        if (score <= 1) return PasswordStrength.WEAK;
+        if (score <= 3) return PasswordStrength.MEDIUM;
+        if (score <= 5) return PasswordStrength.STRONG;
+        return PasswordStrength.VERY_STRONG;
     }
 }
