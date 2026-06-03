@@ -73,7 +73,7 @@ class VaultServiceTest {
                 userRepository.delete(user.getId());
             }
         } catch (SQLException e) {
-            // 忽略
+            System.err.println("cleanupTestData failed: " + e.getMessage());
         }
     }
 
