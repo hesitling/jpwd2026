@@ -6,10 +6,10 @@ import org.florious.passwordmanager.util.Config;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 会话管理器
@@ -25,7 +25,7 @@ public class SessionManager {
 
     private SessionManager() {
         this.cryptoService = new CryptoService();
-        this.listeners = new ArrayList<>();
+        this.listeners = new CopyOnWriteArrayList<>();
     }
 
     /**
