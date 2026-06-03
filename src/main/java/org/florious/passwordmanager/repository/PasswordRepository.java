@@ -114,17 +114,19 @@ public class PasswordRepository {
     }
 
     /**
-     * 根据分类ID获取密码条目
+     * 根据分类ID和用户ID获取密码条目
      * @param categoryId 分类ID
+     * @param userId 用户ID
      * @return 密码条目列表
      * @throws SQLException 如果查询失败
      */
-    public List<PasswordEntry> findByCategoryId(int categoryId) throws SQLException {
-        String sql = "SELECT * FROM password_entries WHERE category_id = ? ORDER BY title";
+    public List<PasswordEntry> findByCategoryId(int categoryId, int userId) throws SQLException {
+        String sql = "SELECT * FROM password_entries WHERE category_id = ? AND user_id = ? ORDER BY title";
         List<PasswordEntry> entries = new ArrayList<>();
         
         try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, categoryId);
+            pstmt.setInt(2, userId);
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

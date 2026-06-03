@@ -239,11 +239,8 @@ public class VaultService {
         Session session = getCurrentSession();
 
         try {
-            List<PasswordEntry> entries = passwordRepository.findByCategoryId(categoryId);
-            // 过滤只返回当前用户的条目
-            return entries.stream()
-                    .filter(e -> e.getUserId() == session.getUser().getId())
-                    .toList();
+            // 直接通过用户ID和分类ID查询，无需内存过滤
+            return passwordRepository.findByCategoryId(categoryId, session.getUser().getId());
         } catch (Exception e) {
             throw new VaultException("获取分类密码条目失败: " + e.getMessage(), e);
         }
