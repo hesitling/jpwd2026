@@ -46,8 +46,8 @@
 - [x] 6.2 实现PasswordPolicy类（长度、字符类型配置）
 - [x] 6.3 实现PasswordStrength枚举（WEAK、MEDIUM、STRONG、VERY_STRONG）
 - [x] 6.4 实现checkStrength方法（密码强度评估算法）
-- [ ] 6.5 实现密码生成器界面PasswordGeneratorDialog
-- [ ] 6.6 实现强度指示器组件StrengthMeter
+- [x] 6.5 实现密码生成器界面PasswordGeneratorDialog
+- [x] 6.6 实现强度指示器组件StrengthMeter
 
 ## 7. 分类管理
 
