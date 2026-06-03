@@ -41,3 +41,7 @@ build/
 ### 应用程序数据 ###
 data/
 *.db
+
+### IDE 工具链接 ###
+jbr
+maven
