@@ -35,11 +35,11 @@ public class Session {
     }
 
     /**
-     * 获取派生的加密密钥
-     * @return 32字节的加密密钥
+     * 获取派生的加密密钥（防御性拷贝）
+     * @return 32字节的加密密钥副本
      */
     public byte[] getDerivedKey() {
-        return derivedKey;
+        return derivedKey != null ? derivedKey.clone() : null;
     }
 
     /**
