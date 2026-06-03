@@ -30,6 +30,15 @@ public class DatabaseManager {
     }
 
     /**
+     * 使用指定路径创建 DatabaseManager（用于测试）
+     * @param dbPath 数据库路径，使用 ":memory:" 创建内存数据库
+     */
+    private DatabaseManager(String dbPath) {
+        this.dbPath = dbPath;
+        initializeDatabase();
+    }
+
+    /**
      * 获取DatabaseManager单例
      * @return DatabaseManager实例
      */
@@ -41,15 +50,43 @@ public class DatabaseManager {
     }
 
     /**
+     * 获取或创建指定路径的 DatabaseManager（用于测试）
+     * 注意：会重置单例实例
+     * @param dbPath 数据库路径，使用 ":memory:" 创建内存数据库
+     * @return DatabaseManager实例
+     */
+    public static synchronized DatabaseManager getInstance(String dbPath) {
+        if (instance == null || !instance.dbPath.equals(dbPath)) {
+            if (instance != null) {
+                instance.closeConnection();
+            }
+            instance = new DatabaseManager(dbPath);
+        }
+        return instance;
+    }
+
+    /**
+     * 重置单例实例（用于测试清理）
+     */
+    public static synchronized void resetInstance() {
+        if (instance != null) {
+            instance.closeConnection();
+            instance = null;
+        }
+    }
+
+    /**
      * 初始化数据库
      * 创建数据库文件和表结构
      */
     private void initializeDatabase() {
         try {
-            // 确保数据库目录存在
-            Path dbDir = Paths.get(dbPath).getParent();
-            if (dbDir != null && !Files.exists(dbDir)) {
-                Files.createDirectories(dbDir);
+            // 确保数据库目录存在（内存数据库跳过）
+            if (!":memory:".equals(dbPath)) {
+                Path dbDir = Paths.get(dbPath).getParent();
+                if (dbDir != null && !Files.exists(dbDir)) {
+                    Files.createDirectories(dbDir);
+                }
             }
 
             // 加载SQLite JDBC驱动

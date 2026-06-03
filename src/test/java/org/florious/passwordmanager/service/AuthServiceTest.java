@@ -20,8 +20,14 @@ class AuthServiceTest {
 
     @BeforeAll
     static void setUpClass() {
-        // 初始化数据库（通过获取实例触发初始化）
-        DatabaseManager.getInstance();
+        // 使用内存数据库进行测试
+        DatabaseManager.getInstance(":memory:");
+    }
+
+    @AfterAll
+    static void tearDownClass() {
+        // 重置数据库实例
+        DatabaseManager.resetInstance();
     }
 
     @BeforeEach
