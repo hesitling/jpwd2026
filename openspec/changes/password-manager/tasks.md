@@ -42,10 +42,10 @@
 
 ## 6. 密码生成
 
-- [ ] 6.1 实现PasswordGenerator类，包含generate方法（根据策略生成密码）
-- [ ] 6.2 实现PasswordPolicy类（长度、字符类型配置）
-- [ ] 6.3 实现PasswordStrength枚举（WEAK、MEDIUM、STRONG、VERY_STRONG）
-- [ ] 6.4 实现checkStrength方法（密码强度评估算法）
+- [x] 6.1 实现PasswordGenerator类，包含generate方法（根据策略生成密码）
+- [x] 6.2 实现PasswordPolicy类（长度、字符类型配置）
+- [x] 6.3 实现PasswordStrength枚举（WEAK、MEDIUM、STRONG、VERY_STRONG）
+- [x] 6.4 实现checkStrength方法（密码强度评估算法）
 - [ ] 6.5 实现密码生成器界面PasswordGeneratorDialog
 - [ ] 6.6 实现强度指示器组件StrengthMeter
 
