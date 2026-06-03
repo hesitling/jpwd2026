@@ -24,21 +24,21 @@
 
 ## 4. 用户认证
 
-- [ ] 4.1 实现AuthService类，包含register方法（用户注册、密码哈希、存储）
-- [ ] 4.2 实现AuthService类，包含login方法（用户登录、密码验证、会话创建）
-- [ ] 4.3 实现AuthService类，包含logout方法（用户登出、会话销毁）
-- [ ] 4.4 实现SessionManager类（会话创建、销毁、超时检查）
-- [ ] 4.5 实现会话监听器接口SessionListener和超时通知机制
+- [x] 4.1 实现AuthService类，包含register方法（用户注册、密码哈希、存储）
+- [x] 4.2 实现AuthService类，包含login方法（用户登录、密码验证、会话创建）
+- [x] 4.3 实现AuthService类，包含logout方法（用户登出、会话销毁）
+- [x] 4.4 实现SessionManager类（会话创建、销毁、超时检查）
+- [x] 4.5 实现会话监听器接口SessionListener和超时通知机制
 
 ## 5. 密码存储
 
-- [ ] 5.1 实现VaultService类，包含addPassword方法（加密密码、存储条目）
-- [ ] 5.2 实现VaultService类，包含getPassword方法（读取条目、解密密码）
-- [ ] 5.3 实现VaultService类，包含updatePassword方法（更新条目、重新加密）
-- [ ] 5.4 实现VaultService类，包含deletePassword方法（删除条目）
-- [ ] 5.5 实现VaultService类，包含searchPasswords方法（按标题、用户名、URL搜索）
-- [ ] 5.6 实现VaultService类，包含getAllPasswords方法（获取所有条目）
-- [ ] 5.7 实现VaultService类，包含getPasswordsByCategory方法（按分类过滤）
+- [x] 5.1 实现VaultService类，包含addPassword方法（加密密码、存储条目）
+- [x] 5.2 实现VaultService类，包含getPassword方法（读取条目、解密密码）
+- [x] 5.3 实现VaultService类，包含updatePassword方法（更新条目、重新加密）
+- [x] 5.4 实现VaultService类，包含deletePassword方法（删除条目）
+- [x] 5.5 实现VaultService类，包含searchPasswords方法（按标题、用户名、URL搜索）
+- [x] 5.6 实现VaultService类，包含getAllPasswords方法（获取所有条目）
+- [x] 5.7 实现VaultService类，包含getPasswordsByCategory方法（按分类过滤）
 
 ## 6. 密码生成
 
@@ -99,12 +99,12 @@
 
 ## 12. 测试和优化
 
-- [ ] 12.1 编写CryptoService单元测试（加密解密一致性、边界条件）
+- [x] 12.1 编写CryptoService单元测试（加密解密一致性、边界条件）
 - [ ] 12.2 编写PasswordGenerator单元测试（生成策略、强度评估）
 - [ ] 12.3 编写CsvHandler单元测试（特殊字符处理、编码问题）
 - [ ] 12.4 编写SessionManager单元测试（超时逻辑）
-- [ ] 12.5 编写Repository层单元测试（CRUD操作、查询）
-- [ ] 12.6 编写Service层集成测试（业务流程测试）
+- [x] 12.5 编写Repository层单元测试（CRUD操作、查询）
+- [x] 12.6 编写Service层集成测试（业务流程测试）
 - [ ] 12.7 编写UI测试（登录流程、密码管理、导入导出）
 - [ ] 12.8 性能优化（数据库查询优化、内存管理）
 - [ ] 12.9 错误处理完善（异常类型、用户友好提示）
