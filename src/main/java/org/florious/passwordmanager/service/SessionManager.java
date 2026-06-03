@@ -113,10 +113,11 @@ public class SessionManager {
      * @return 当前会话，如果不存在返回null
      */
     public Session getCurrentSession() {
-        if (currentSession != null) {
-            currentSession.updateActivity();
+        Session session = currentSession;
+        if (session != null) {
+            session.updateActivity();
         }
-        return currentSession;
+        return session;
     }
 
     /**

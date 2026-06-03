@@ -18,8 +18,9 @@ public class Main {
         
         // 测试数据库初始化
         System.out.println("\n2. 初始化数据库...");
+        DatabaseManager dbManager = null;
         try {
-            DatabaseManager dbManager = DatabaseManager.getInstance();
+            dbManager = DatabaseManager.getInstance();
             System.out.println("   数据库初始化成功");
             System.out.println("   数据库文件: " + dbManager.getDbPath());
             
@@ -28,13 +29,15 @@ public class Main {
                 System.out.println("   数据库连接正常");
             }
             
-            // 清理资源
-            dbManager.closeConnection();
-            System.out.println("   数据库连接已关闭");
-            
         } catch (Exception e) {
             System.err.println("   数据库初始化失败: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            // 确保资源被清理
+            if (dbManager != null) {
+                dbManager.closeConnection();
+                System.out.println("   数据库连接已关闭");
+            }
         }
         
         System.out.println("\n=== 密码管理器启动完成 ===");
