@@ -293,14 +293,22 @@ public class VaultService {
     }
 
     /**
-     * 从加密结果中提取IV（Base64编码的前12字节）
-     * @param encryptedPassword 加密后的密码
+     * 从加密结果中提取IV
+     * CryptoService.encryptPassword 输出格式：Base64(IV[12字节] + 密文)
+     * @param encryptedPassword 加密后的密码（Base64编码）
      * @return IV的Base64编码
      */
     private String extractIVFromEncrypted(String encryptedPassword) {
-        // IV已包含在加密结果中，这里返回空字符串
-        // 实际上PasswordEntry中的iv字段是冗余的，因为IV已在encryptedPassword中
-        return "";
+        try {
+            byte[] decoded = java.util.Base64.getDecoder().decode(encryptedPassword);
+            // IV 是前 12 字节
+            byte[] iv = new byte[12];
+            System.arraycopy(decoded, 0, iv, 0, 12);
+            return java.util.Base64.getEncoder().encodeToString(iv);
+        } catch (Exception e) {
+            // 如果解析失败，返回空字符串（兼容性处理）
+            return "";
+        }
     }
 
     /**
