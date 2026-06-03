@@ -117,8 +117,9 @@ class PasswordGeneratorTest {
 
     @Test
     void testCheckStrengthMedium() {
-        assertEquals(PasswordStrength.MEDIUM, passwordGenerator.checkStrength("abcdefgh")); // 8位，只有小写
-        assertEquals(PasswordStrength.MEDIUM, passwordGenerator.checkStrength("12345678")); // 8位，只有数字
+        // 规范：8-11个字符，包含两种字符类型 → 中
+        assertEquals(PasswordStrength.MEDIUM, passwordGenerator.checkStrength("Abcdefgh")); // 8位，大小写
+        assertEquals(PasswordStrength.MEDIUM, passwordGenerator.checkStrength("abcd1234")); // 8位，小写+数字
     }
 
     @Test
@@ -128,8 +129,8 @@ class PasswordGeneratorTest {
 
     @Test
     void testCheckStrengthVeryStrong() {
-        // 16位，包含所有字符类型，无重复和连续字符
-        String password = "A1b2C3d4E5f6G7h8";
+        // 16位，包含所有字符类型（大小写、数字、符号），无重复和连续字符
+        String password = "A1b2C3d4E5f6G7h!";
         assertEquals(PasswordStrength.VERY_STRONG, passwordGenerator.checkStrength(password));
     }
 
