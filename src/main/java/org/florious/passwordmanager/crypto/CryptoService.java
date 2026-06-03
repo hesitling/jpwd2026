@@ -219,9 +219,8 @@ public class CryptoService {
                     .addSalt(salt)
                     .with(argon2);
 
-            // 获取哈希结果的字节数组
-            String hashResult = hash.getResult();
-            byte[] hashBytes = hashResult.getBytes();
+            // 获取哈希的原始字节数组
+            byte[] hashBytes = hash.getBytes();
 
             // 确保密钥长度为32字节
             byte[] key = new byte[32];
