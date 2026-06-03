@@ -186,6 +186,11 @@ public class CryptoService {
             // 解码Base64
             byte[] decoded = Base64.getDecoder().decode(encryptedPassword);
 
+            // 校验解码后的数据长度
+            if (decoded.length <= IV_LENGTH) {
+                throw new CryptoException("加密数据格式错误：长度不足");
+            }
+
             // 提取IV
             byte[] iv = new byte[IV_LENGTH];
             System.arraycopy(decoded, 0, iv, 0, IV_LENGTH);
@@ -315,6 +320,7 @@ public class CryptoService {
      * 将十六进制字符串转换为字节数组
      * @param hex 十六进制字符串
      * @return 字节数组
+     * @throws IllegalArgumentException 如果输入格式无效
      */
     public static byte[] hexToBytes(String hex) {
         if (hex == null || hex.isEmpty()) {
@@ -322,10 +328,18 @@ public class CryptoService {
         }
 
         int len = hex.length();
+        if (len % 2 != 0) {
+            throw new IllegalArgumentException("十六进制字符串长度必须为偶数");
+        }
+
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                    + Character.digit(hex.charAt(i + 1), 16));
+            int high = Character.digit(hex.charAt(i), 16);
+            int low = Character.digit(hex.charAt(i + 1), 16);
+            if (high == -1 || low == -1) {
+                throw new IllegalArgumentException("无效的十六进制字符: " + hex.substring(i, i + 2));
+            }
+            data[i / 2] = (byte) ((high << 4) + low);
         }
         return data;
     }
