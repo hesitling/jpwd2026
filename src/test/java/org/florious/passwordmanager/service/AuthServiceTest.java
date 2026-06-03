@@ -70,16 +70,17 @@ class AuthServiceTest {
 
         @Test
         @DisplayName("应该拒绝已存在的用户名")
-        void shouldRejectExistingUsername() {
+        void shouldRejectExistingUsername() throws AuthService.AuthException {
             // Given
             String username = "testuser";
             String password = "TestPassword123!";
+            authService.register(username, password);
 
             // When & Then
-            assertThrows(AuthService.AuthException.class, () -> {
-                authService.register(username, password);
+            AuthService.AuthException exception = assertThrows(AuthService.AuthException.class, () -> {
                 authService.register(username, "AnotherPassword456!");
             });
+            assertTrue(exception.getMessage().contains("用户名已存在"));
         }
 
         @Test
