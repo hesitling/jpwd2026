@@ -59,17 +59,10 @@ public class StrengthMeter extends JPanel {
     }
 
     private Color getStrengthColor() {
-        switch (strength) {
-            case WEAK:
-                return Color.RED;
-            case MEDIUM:
-                return Color.YELLOW;
-            case STRONG:
-                return Color.BLUE;
-            case VERY_STRONG:
-                return Color.GREEN;
-            default:
-                return Color.RED;
+        try {
+            return Color.decode(strength.getColorCode());
+        } catch (NumberFormatException e) {
+            return Color.RED;
         }
     }
 
