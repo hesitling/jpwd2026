@@ -35,6 +35,17 @@ public class PasswordGenerator {
             throw new IllegalArgumentException("至少需要选择一种字符类型");
         }
 
+        int selectedTypeCount = 0;
+        if (policy.isIncludeUppercase()) selectedTypeCount++;
+        if (policy.isIncludeLowercase()) selectedTypeCount++;
+        if (policy.isIncludeDigits()) selectedTypeCount++;
+        if (policy.isIncludeSymbols()) selectedTypeCount++;
+
+        if (policy.getLength() < selectedTypeCount) {
+            throw new IllegalArgumentException(
+                    String.format("密码长度(%d)不能小于已选字符类型数(%d)", policy.getLength(), selectedTypeCount));
+        }
+
         // 构建字符池
         StringBuilder charPool = new StringBuilder();
         if (policy.isIncludeUppercase()) {

@@ -109,6 +109,37 @@ class PasswordGeneratorTest {
     }
 
     @Test
+    void testGenerateWithLengthLessThanSelectedTypes() {
+        // 长度=2，但选了4种类型，应抛出异常
+        PasswordPolicy policy = new PasswordPolicy();
+        policy.setLength(2);
+        policy.setIncludeUppercase(true);
+        policy.setIncludeLowercase(true);
+        policy.setIncludeDigits(true);
+        policy.setIncludeSymbols(true);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            passwordGenerator.generate(policy);
+        });
+        assertTrue(exception.getMessage().contains("不能小于已选字符类型数"));
+    }
+
+    @Test
+    void testGenerateWithLengthEqualToSelectedTypes() {
+        // 长度=3，选了3种类型，应正常生成
+        PasswordPolicy policy = new PasswordPolicy();
+        policy.setLength(3);
+        policy.setIncludeUppercase(true);
+        policy.setIncludeLowercase(true);
+        policy.setIncludeDigits(true);
+        policy.setIncludeSymbols(false);
+
+        String password = passwordGenerator.generate(policy);
+        assertNotNull(password);
+        assertEquals(3, password.length());
+    }
+
+    @Test
     void testCheckStrengthWeak() {
         assertEquals(PasswordStrength.WEAK, passwordGenerator.checkStrength("123"));
         assertEquals(PasswordStrength.WEAK, passwordGenerator.checkStrength("abc"));
