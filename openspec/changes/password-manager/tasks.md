@@ -17,10 +17,10 @@
 
 ## 3. 加密服务
 
-- [ ] 3.1 实现CryptoService类，包含Argon2id哈希方法（hashMasterPassword、verifyMasterPassword）
-- [ ] 3.2 实现CryptoService类，包含AES-GCM-256加密方法（encryptPassword、decryptPassword）
-- [ ] 3.3 实现密钥派生方法（deriveKey），从主密码和盐值派生32字节密钥
-- [ ] 3.4 实现安全随机数生成方法（generateSalt、generateIV）
+- [x] 3.1 实现CryptoService类，包含Argon2id哈希方法（hashMasterPassword、verifyMasterPassword）
+- [x] 3.2 实现CryptoService类，包含AES-GCM-256加密方法（encryptPassword、decryptPassword）
+- [x] 3.3 实现密钥派生方法（deriveKey），从主密码和盐值派生32字节密钥
+- [x] 3.4 实现安全随机数生成方法（generateSalt、generateIV）
 
 ## 4. 用户认证
 
