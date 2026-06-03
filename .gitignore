@@ -5,10 +5,7 @@ target/
 .kotlin
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -37,3 +34,11 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### 应用程序数据 ###
+data/
+*.db
+
+### IDE 工具链接 ###
+jbr
+maven
