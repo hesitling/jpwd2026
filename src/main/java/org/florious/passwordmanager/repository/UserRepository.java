@@ -4,6 +4,8 @@ import org.florious.passwordmanager.model.User;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,9 @@ import java.util.List;
  * 负责用户数据的CRUD操作
  */
 public class UserRepository {
+    private static final DateTimeFormatter DB_TIMESTAMP_FORMATTER = 
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    
     private final DatabaseManager dbManager;
 
     public UserRepository() {
@@ -35,7 +40,7 @@ public class UserRepository {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPasswordHash());
             pstmt.setString(3, user.getSalt());
-            pstmt.setString(4, user.getCreatedAt().toString());
+            pstmt.setString(4, user.getCreatedAt().format(DB_TIMESTAMP_FORMATTER));
             
             int affectedRows = pstmt.executeUpdate();
             
@@ -232,12 +237,30 @@ public class UserRepository {
         
         String createdAt = rs.getString("created_at");
         if (createdAt != null) {
-            user.setCreatedAt(LocalDateTime.parse(createdAt));
+            try {
+                user.setCreatedAt(LocalDateTime.parse(createdAt, DB_TIMESTAMP_FORMATTER));
+            } catch (DateTimeParseException e) {
+                // 尝试使用默认 ISO 格式解析
+                try {
+                    user.setCreatedAt(LocalDateTime.parse(createdAt));
+                } catch (DateTimeParseException e2) {
+                    System.err.println("警告: 无法解析 created_at 时间戳: " + createdAt);
+                }
+            }
         }
         
         String lastLogin = rs.getString("last_login");
         if (lastLogin != null) {
-            user.setLastLogin(LocalDateTime.parse(lastLogin));
+            try {
+                user.setLastLogin(LocalDateTime.parse(lastLogin, DB_TIMESTAMP_FORMATTER));
+            } catch (DateTimeParseException e) {
+                // 尝试使用默认 ISO 格式解析
+                try {
+                    user.setLastLogin(LocalDateTime.parse(lastLogin));
+                } catch (DateTimeParseException e2) {
+                    System.err.println("警告: 无法解析 last_login 时间戳: " + lastLogin);
+                }
+            }
         }
         
         return user;
