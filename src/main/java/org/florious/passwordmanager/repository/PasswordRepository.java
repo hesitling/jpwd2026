@@ -147,16 +147,20 @@ public class PasswordRepository {
         String sql = """
             SELECT * FROM password_entries 
             WHERE user_id = ? AND (
-                title LIKE ? OR 
-                username LIKE ? OR 
-                url LIKE ? OR
-                notes LIKE ?
+                title LIKE ? ESCAPE '\\' OR 
+                username LIKE ? ESCAPE '\\' OR 
+                url LIKE ? ESCAPE '\\' OR
+                notes LIKE ? ESCAPE '\\'
             )
             ORDER BY title
         """;
         
         List<PasswordEntry> entries = new ArrayList<>();
-        String searchPattern = "%" + query + "%";
+        // 转义 SQL LIKE 通配符
+        String escapedQuery = query.replace("\\", "\\\\")
+                                   .replace("%", "\\%")
+                                   .replace("_", "\\_");
+        String searchPattern = "%" + escapedQuery + "%";
         
         try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, userId);
