@@ -46,14 +46,17 @@ public class AuthService {
                 throw new AuthException("用户名已存在");
             }
 
-            // 生成盐值
+            // 生成认证盐值
             String salt = cryptoService.generateSalt();
+
+            // 生成独立的加密密钥派生盐值（域分离）
+            String vaultSalt = cryptoService.generateSalt();
 
             // 使用Argon2id哈希密码
             String passwordHash = cryptoService.hashMasterPassword(masterPassword, salt);
 
             // 创建用户对象
-            User user = new User(username, passwordHash, salt);
+            User user = new User(username, passwordHash, salt, vaultSalt);
 
             // 保存到数据库
             return userRepository.create(user);

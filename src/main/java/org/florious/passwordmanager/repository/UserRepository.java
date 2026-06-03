@@ -34,8 +34,8 @@ public class UserRepository {
      */
     public User create(User user) throws SQLException {
         String sql = """
-            INSERT INTO users (username, password_hash, salt, created_at)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO users (username, password_hash, salt, vault_salt, created_at)
+            VALUES (?, ?, ?, ?, ?)
         """;
 
         try (PreparedStatement pstmt = dbManager.getConnection().prepareStatement(sql, 
@@ -43,7 +43,8 @@ public class UserRepository {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPasswordHash());
             pstmt.setString(3, user.getSalt());
-            pstmt.setString(4, user.getCreatedAt().format(DB_TIMESTAMP_FORMATTER));
+            pstmt.setString(4, user.getVaultSalt());
+            pstmt.setString(5, user.getCreatedAt().format(DB_TIMESTAMP_FORMATTER));
             
             int affectedRows = pstmt.executeUpdate();
             
@@ -237,6 +238,7 @@ public class UserRepository {
         user.setUsername(rs.getString("username"));
         user.setPasswordHash(rs.getString("password_hash"));
         user.setSalt(rs.getString("salt"));
+        user.setVaultSalt(rs.getString("vault_salt"));
         
         String createdAt = rs.getString("created_at");
         if (createdAt != null) {

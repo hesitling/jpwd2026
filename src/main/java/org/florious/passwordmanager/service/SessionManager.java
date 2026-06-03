@@ -76,8 +76,13 @@ public class SessionManager {
             destroySession();
         }
 
-        // 从主密码派生加密密钥
-        byte[] derivedKey = cryptoService.deriveKey(masterPassword, user.getSalt());
+        // 使用独立的 vaultSalt 派生加密密钥（域分离，与认证哈希独立）
+        String vaultSalt = user.getVaultSalt();
+        if (vaultSalt == null || vaultSalt.isEmpty()) {
+            // 向后兼容：旧用户没有 vaultSalt，使用 salt
+            vaultSalt = user.getSalt();
+        }
+        byte[] derivedKey = cryptoService.deriveKey(masterPassword, vaultSalt);
 
         // 创建新会话
         currentSession = new Session(user, derivedKey);

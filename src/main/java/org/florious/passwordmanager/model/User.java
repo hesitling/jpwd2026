@@ -11,6 +11,7 @@ public class User {
     private String username;
     private String passwordHash;
     private String salt;
+    private String vaultSalt;  // 用于派生加密密钥的独立盐值
     private LocalDateTime createdAt;
     private LocalDateTime lastLogin;
 
@@ -24,12 +25,14 @@ public class User {
      * 创建新用户的构造函数
      * @param username 用户名
      * @param passwordHash 密码哈希
-     * @param salt 盐值
+     * @param salt 认证盐值
+     * @param vaultSalt 加密密钥派生盐值
      */
-    public User(String username, String passwordHash, String salt) {
+    public User(String username, String passwordHash, String salt, String vaultSalt) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.salt = salt;
+        this.vaultSalt = vaultSalt;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -65,6 +68,14 @@ public class User {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public String getVaultSalt() {
+        return vaultSalt;
+    }
+
+    public void setVaultSalt(String vaultSalt) {
+        this.vaultSalt = vaultSalt;
     }
 
     public LocalDateTime getCreatedAt() {

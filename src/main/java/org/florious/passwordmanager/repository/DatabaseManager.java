@@ -130,10 +130,18 @@ public class DatabaseManager {
                     username TEXT UNIQUE NOT NULL,
                     password_hash TEXT NOT NULL,
                     salt TEXT NOT NULL,
+                    vault_salt TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     last_login TIMESTAMP
                 )
             """);
+            
+            // 为旧表添加 vault_salt 列（如果不存在）
+            try {
+                stmt.execute("ALTER TABLE users ADD COLUMN vault_salt TEXT");
+            } catch (SQLException e) {
+                // 列已存在，忽略
+            }
 
             // 创建分类表
             stmt.execute("""
