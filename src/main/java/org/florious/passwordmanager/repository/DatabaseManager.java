@@ -19,6 +19,7 @@ public class DatabaseManager {
     private static DatabaseManager instance;
     private Connection connection;
     private final String dbPath;
+    private final Object txLock = new Object();
 
     private DatabaseManager() {
         this.dbPath = Config.getDatabasePath();
@@ -179,7 +180,9 @@ public class DatabaseManager {
      * @throws SQLException 如果事务开始失败
      */
     public void beginTransaction() throws SQLException {
-        getConnection().setAutoCommit(false);
+        synchronized (txLock) {
+            getConnection().setAutoCommit(false);
+        }
     }
 
     /**
@@ -187,8 +190,13 @@ public class DatabaseManager {
      * @throws SQLException 如果提交失败
      */
     public void commitTransaction() throws SQLException {
-        getConnection().commit();
-        getConnection().setAutoCommit(true);
+        synchronized (txLock) {
+            try {
+                getConnection().commit();
+            } finally {
+                getConnection().setAutoCommit(true);
+            }
+        }
     }
 
     /**
@@ -196,8 +204,13 @@ public class DatabaseManager {
      * @throws SQLException 如果回滚失败
      */
     public void rollbackTransaction() throws SQLException {
-        getConnection().rollback();
-        getConnection().setAutoCommit(true);
+        synchronized (txLock) {
+            try {
+                getConnection().rollback();
+            } finally {
+                getConnection().setAutoCommit(true);
+            }
+        }
     }
 
     /**
