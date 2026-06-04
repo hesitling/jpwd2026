@@ -101,6 +101,20 @@ public class SessionManager {
     }
 
     /**
+     * 手动锁定会话
+     * 立即销毁会话并通知监听器
+     */
+    public void lock() {
+        if (currentSession != null) {
+            // 通知锁定
+            notifySessionLocked();
+
+            // 销毁会话
+            destroySession();
+        }
+    }
+
+    /**
      * 销毁当前会话
      */
     public void destroySession() {
@@ -262,6 +276,15 @@ public class SessionManager {
     }
 
     /**
+     * 通知会话锁定
+     */
+    private void notifySessionLocked() {
+        for (SessionListener listener : listeners) {
+            listener.onSessionLocked();
+        }
+    }
+
+    /**
      * 会话监听器接口
      */
     public interface SessionListener {
@@ -280,5 +303,10 @@ public class SessionManager {
          * 会话超时时调用
          */
         void onSessionTimeout();
+
+        /**
+         * 手动锁定时调用
+         */
+        void onSessionLocked();
     }
 }
