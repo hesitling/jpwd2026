@@ -288,6 +288,12 @@ public class MainFrame extends JFrame implements SessionManager.SessionListener 
     }
     
     public void showVaultPanel() {
+        // 登录成功时保存用户名，用于锁定后解锁
+        Session session = sessionManager.getCurrentSession();
+        if (session != null) {
+            lockedUsername = session.getUser().getUsername();
+        }
+        
         cardLayout.show(contentPanel, VAULT_PANEL);
         refreshData();
     }
