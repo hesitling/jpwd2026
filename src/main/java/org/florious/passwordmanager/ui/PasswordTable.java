@@ -112,13 +112,8 @@ public class PasswordTable extends JTable {
     private void showPasswordDetail() {
         PasswordEntry entry = getSelectedPasswordEntry();
         if (entry != null) {
-            // TODO: 显示密码详情对话框
-            JOptionPane.showMessageDialog(this, 
-                    "标题: " + entry.getTitle() + "\n" +
-                    "用户名: " + entry.getUsername() + "\n" +
-                    "URL: " + entry.getUrl(),
-                    "密码详情", 
-                    JOptionPane.INFORMATION_MESSAGE);
+            PasswordDetailDialog dialog = new PasswordDetailDialog(mainFrame, entry.getId());
+            dialog.setVisible(true);
         }
     }
     
