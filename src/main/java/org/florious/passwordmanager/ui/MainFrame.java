@@ -298,8 +298,8 @@ public class MainFrame extends JFrame {
     }
     
     private void showSettingsDialog() {
-        // TODO: 实现设置对话框
-        JOptionPane.showMessageDialog(this, "设置功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+        SettingsDialog dialog = new SettingsDialog(this);
+        dialog.setVisible(true);
     }
     
     private void showPasswordGenerator() {
