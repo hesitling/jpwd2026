@@ -39,7 +39,8 @@ public class CategoryService {
      * @throws CategoryException 如果创建失败
      */
     public Category createCategory(String name, String color) throws CategoryException {
-        // 验证输入
+        // 规范化和验证输入
+        name = normalizeCategoryName(name);
         validateCategoryName(name);
 
         // 获取当前会话
@@ -113,7 +114,8 @@ public class CategoryService {
      * @throws CategoryException 如果更新失败
      */
     public Category updateCategory(int categoryId, String name, String color) throws CategoryException {
-        // 验证输入
+        // 规范化和验证输入
+        name = normalizeCategoryName(name);
         validateCategoryName(name);
 
         Session session = getCurrentSession();
@@ -313,8 +315,15 @@ public class CategoryService {
      * @param name 分类名称
      * @throws CategoryException 如果验证失败
      */
+    private String normalizeCategoryName(String name) {
+        if (name == null) {
+            return null;
+        }
+        return name.trim();
+    }
+
     private void validateCategoryName(String name) throws CategoryException {
-        if (name == null || name.trim().isEmpty()) {
+        if (name == null || name.isEmpty()) {
             throw new CategoryException("分类名称不能为空");
         }
         if (name.length() > 50) {
