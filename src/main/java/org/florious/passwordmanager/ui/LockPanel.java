@@ -21,9 +21,10 @@ public class LockPanel extends JPanel {
      */
     public interface UnlockCallback {
         /**
-         * 解锁成功时调用
+         * 验证密码并尝试解锁
+         * @param password 主密码
          */
-        void onUnlockSuccess();
+        void onUnlockAttempt(String password);
 
         /**
          * 解锁失败时调用
@@ -124,17 +125,21 @@ public class LockPanel extends JPanel {
      * 尝试解锁
      */
     private void attemptUnlock() {
-        String password = new String(passwordField.getPassword());
-        if (password.isEmpty()) {
+        char[] passwordChars = passwordField.getPassword();
+        if (passwordChars.length == 0) {
             statusLabel.setText("请输入主密码");
             statusLabel.setForeground(new Color(255, 100, 100));
             passwordField.requestFocus();
             return;
         }
 
+        String password = new String(passwordChars);
+        // 清除 char[] 以减少内存中的敏感数据
+        java.util.Arrays.fill(passwordChars, '\0');
+
         // 通知回调进行解锁验证
         if (unlockCallback != null) {
-            unlockCallback.onUnlockSuccess();
+            unlockCallback.onUnlockAttempt(password);
         }
     }
 
