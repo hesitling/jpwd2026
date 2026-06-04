@@ -2,6 +2,7 @@ package org.florious.passwordmanager.ui;
 
 import org.florious.passwordmanager.model.PasswordEntry;
 import org.florious.passwordmanager.service.AuthService;
+import org.florious.passwordmanager.service.Session;
 import org.florious.passwordmanager.service.SessionManager;
 import org.florious.passwordmanager.service.VaultService;
 
@@ -234,10 +235,25 @@ public class MainFrame extends JFrame {
         LoginPanel loginPanel = new LoginPanel(this);
         RegisterPanel registerPanel = new RegisterPanel(this);
         vaultPanel = new VaultPanel(this);
+        lockPanel = new LockPanel();
+        
+        // 设置锁定面板的解锁回调
+        lockPanel.setUnlockCallback(new LockPanel.UnlockCallback() {
+            @Override
+            public void onUnlockAttempt(String password) {
+                handleUnlock(password);
+            }
+            
+            @Override
+            public void onUnlockFailure(String message) {
+                lockPanel.showError(message);
+            }
+        });
         
         contentPanel.add(loginPanel, LOGIN_PANEL);
         contentPanel.add(registerPanel, REGISTER_PANEL);
         contentPanel.add(vaultPanel, VAULT_PANEL);
+        contentPanel.add(lockPanel, LOCK_PANEL);
         
         add(contentPanel, BorderLayout.CENTER);
     }
@@ -255,6 +271,12 @@ public class MainFrame extends JFrame {
     public void showLoginPanel() {
         cardLayout.show(contentPanel, LOGIN_PANEL);
         updateSessionStatus();
+    }
+    
+    public void showLockPanel() {
+        cardLayout.show(contentPanel, LOCK_PANEL);
+        lockPanel.clearPassword();
+        lockPanel.requestPasswordFocus();
     }
     
     public void showRegisterPanel() {
@@ -358,8 +380,33 @@ public class MainFrame extends JFrame {
     }
     
     public void lockApplication() {
+        // 保存当前用户名
+        Session session = sessionManager.getCurrentSession();
+        if (session != null) {
+            lockedUsername = session.getUser().getUsername();
+        }
+        
+        // 销毁会话
         sessionManager.destroySession();
-        showLoginPanel();
+        
+        // 显示锁定面板
+        showLockPanel();
+    }
+    
+    private void handleUnlock(String password) {
+        if (lockedUsername == null || lockedUsername.isEmpty()) {
+            lockPanel.showError("无法获取用户名，请重新登录");
+            showLoginPanel();
+            return;
+        }
+        
+        try {
+            authService.login(lockedUsername, password);
+            // 解锁成功
+            showVaultPanel();
+        } catch (AuthService.AuthException e) {
+            lockPanel.showError("密码错误");
+        }
     }
     
     public void exitApplication() {
