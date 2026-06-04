@@ -270,8 +270,9 @@ public class MainFrame extends JFrame {
     }
     
     private void showAddPasswordDialog() {
-        // TODO: 实现添加密码对话框
-        JOptionPane.showMessageDialog(this, "添加密码功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+        PasswordDialog dialog = new PasswordDialog(this, PasswordDialog.DialogMode.ADD);
+        dialog.setVisible(true);
+        refreshData();
     }
     
     private void showEditPasswordDialog() {
