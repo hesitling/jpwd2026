@@ -9,7 +9,9 @@ import org.florious.passwordmanager.service.VaultService;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * CSV导入导出处理器
@@ -82,8 +84,11 @@ public class CsvHandler {
             // 验证CSV格式
             validateCsvRecords(records);
             
+            // 预加载分类映射（性能优化）
+            Map<String, Integer> categoryMap = loadCategoryMap();
+            
             // 处理导入
-            int importedCount = 0;
+            int createdCount = 0;
             int skippedCount = 0;
             int overwrittenCount = 0;
             int renamedCount = 0;
@@ -98,22 +103,22 @@ public class CsvHandler {
                             skippedCount++;
                             continue;
                         case OVERWRITE:
-                            updateExistingEntry(existingEntry, record);
+                            updateExistingEntry(existingEntry, record, categoryMap);
                             overwrittenCount++;
                             break;
                         case RENAME:
                             record = record.withTitle(generateUniqueTitle(record.title()));
-                            importNewEntry(record);
+                            importNewEntry(record, categoryMap);
                             renamedCount++;
                             break;
                     }
                 } else {
-                    importNewEntry(record);
+                    importNewEntry(record, categoryMap);
+                    createdCount++;
                 }
-                importedCount++;
             }
             
-            return new ImportResult(importedCount, skippedCount, overwrittenCount, renamedCount);
+            return new ImportResult(createdCount, skippedCount, overwrittenCount, renamedCount);
         } catch (CsvException e) {
             throw e;
         } catch (Exception e) {
@@ -170,6 +175,11 @@ public class CsvHandler {
             String headerLine = reader.readLine();
             if (headerLine == null) {
                 throw new CsvException("CSV文件为空");
+            }
+            
+            // 去除UTF-8 BOM（如果存在）
+            if (headerLine.startsWith("\uFEFF")) {
+                headerLine = headerLine.substring(1);
             }
             
             // 解析标题行
@@ -342,9 +352,9 @@ public class CsvHandler {
      * @param record CSV记录
      * @throws Exception 如果更新失败
      */
-    private void updateExistingEntry(PasswordEntry existingEntry, CsvRecord record) throws Exception {
+    private void updateExistingEntry(PasswordEntry existingEntry, CsvRecord record, Map<String, Integer> categoryMap) throws Exception {
         // 查找分类ID
-        Integer categoryId = findCategoryIdByName(record.category());
+        Integer categoryId = findCategoryIdByName(record.category(), categoryMap);
         
         vaultService.updatePassword(
             existingEntry.getId(),
@@ -362,9 +372,9 @@ public class CsvHandler {
      * @param record CSV记录
      * @throws Exception 如果导入失败
      */
-    private void importNewEntry(CsvRecord record) throws Exception {
+    private void importNewEntry(CsvRecord record, Map<String, Integer> categoryMap) throws Exception {
         // 查找分类ID
-        Integer categoryId = findCategoryIdByName(record.category());
+        Integer categoryId = findCategoryIdByName(record.category(), categoryMap);
         
         vaultService.addPassword(
             record.title(),
@@ -377,23 +387,30 @@ public class CsvHandler {
     }
 
     /**
-     * 根据分类名称查找分类ID
-     * @param categoryName 分类名称
-     * @return 分类ID，如果不存在返回null
-     * @throws Exception 如果查询失败
+     * 加载分类映射（名称 -> ID）
+     * @return 分类映射
+     * @throws Exception 如果加载失败
      */
-    private Integer findCategoryIdByName(String categoryName) throws Exception {
+    private Map<String, Integer> loadCategoryMap() throws Exception {
+        Map<String, Integer> categoryMap = new HashMap<>();
+        List<Category> categories = categoryService.getAllCategories();
+        for (Category category : categories) {
+            categoryMap.put(category.getName(), category.getId());
+        }
+        return categoryMap;
+    }
+    
+    /**
+     * 根据分类名称查找分类ID（使用预加载的映射）
+     * @param categoryName 分类名称
+     * @param categoryMap 分类映射
+     * @return 分类ID，如果不存在返回null
+     */
+    private Integer findCategoryIdByName(String categoryName, Map<String, Integer> categoryMap) {
         if (categoryName == null || categoryName.trim().isEmpty()) {
             return null;
         }
-        
-        List<Category> categories = categoryService.getAllCategories();
-        for (Category category : categories) {
-            if (category.getName().equals(categoryName)) {
-                return category.getId();
-            }
-        }
-        return null;
+        return categoryMap.get(categoryName);
     }
 
     /**
@@ -502,25 +519,29 @@ public class CsvHandler {
      * 导入结果内部类
      */
     public static class ImportResult {
-        private final int importedCount;
+        private final int createdCount;
         private final int skippedCount;
         private final int overwrittenCount;
         private final int renamedCount;
 
-        public ImportResult(int importedCount, int skippedCount, int overwrittenCount, int renamedCount) {
-            this.importedCount = importedCount;
+        public ImportResult(int createdCount, int skippedCount, int overwrittenCount, int renamedCount) {
+            this.createdCount = createdCount;
             this.skippedCount = skippedCount;
             this.overwrittenCount = overwrittenCount;
             this.renamedCount = renamedCount;
         }
 
-        public int getImportedCount() { return importedCount; }
+        public int getCreatedCount() { return createdCount; }
         public int getSkippedCount() { return skippedCount; }
         public int getOverwrittenCount() { return overwrittenCount; }
         public int getRenamedCount() { return renamedCount; }
         
         public int getTotalProcessed() {
-            return importedCount + skippedCount + overwrittenCount + renamedCount;
+            return createdCount + overwrittenCount + renamedCount;
+        }
+        
+        public int getTotalImported() {
+            return createdCount + overwrittenCount + renamedCount;
         }
     }
 
