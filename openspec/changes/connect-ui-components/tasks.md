@@ -1,6 +1,6 @@
 ## 1. 创建 PasswordDetailDialog
 
-- [ ] 1.1 创建 PasswordDetailDialog 类，包含所有字段的显示
+- [x] 1.1 创建 PasswordDetailDialog 类，包含所有字段的显示
 - [ ] 1.2 实现密码显示/隐藏切换功能
 - [ ] 1.3 实现字段复制功能（标题、用户名、密码、URL）
 - [ ] 1.4 实现编辑按钮（关闭详情对话框并打开 PasswordDialog）

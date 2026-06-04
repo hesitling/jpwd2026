@@ -23,6 +23,7 @@ public class MainFrame extends JFrame {
     private JPanel statusPanel;
     private JPanel contentPanel;
     private CardLayout cardLayout;
+    private VaultPanel vaultPanel;
     
     // 状态栏组件
     private JLabel selectionLabel;
@@ -229,7 +230,7 @@ public class MainFrame extends JFrame {
         // 创建各个面板
         LoginPanel loginPanel = new LoginPanel(this);
         RegisterPanel registerPanel = new RegisterPanel(this);
-        VaultPanel vaultPanel = new VaultPanel(this);
+        vaultPanel = new VaultPanel(this);
         
         contentPanel.add(loginPanel, LOGIN_PANEL);
         contentPanel.add(registerPanel, REGISTER_PANEL);
@@ -316,6 +317,10 @@ public class MainFrame extends JFrame {
     
     public VaultService getVaultService() {
         return vaultService;
+    }
+    
+    public VaultPanel getVaultPanel() {
+        return vaultPanel;
     }
     
     public void refreshData() {
