@@ -311,8 +311,15 @@ public class CategoryManagementDialog extends JDialog {
 
             gbc.gridx = 1;
             colorButton = new JButton("选择颜色");
-            colorButton.setBackground(currentColor != null && !currentColor.isEmpty() ?
-                    Color.decode(currentColor) : Color.WHITE);
+            Color bgColor = Color.WHITE;
+            if (currentColor != null && !currentColor.isEmpty()) {
+                try {
+                    bgColor = Color.decode(currentColor);
+                } catch (NumberFormatException ignored) {
+                    // 颜色格式错误，使用默认白色
+                }
+            }
+            colorButton.setBackground(bgColor);
             colorButton.addActionListener(e -> {
                 Color chosen = JColorChooser.showDialog(this, "选择分类颜色", colorButton.getBackground());
                 if (chosen != null) {
