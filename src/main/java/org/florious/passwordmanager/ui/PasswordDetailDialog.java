@@ -4,6 +4,7 @@ import org.florious.passwordmanager.model.Category;
 import org.florious.passwordmanager.service.CategoryService;
 import org.florious.passwordmanager.service.VaultService;
 import org.florious.passwordmanager.util.ClipboardUtil;
+import java.awt.event.ActionEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -284,7 +285,10 @@ public class PasswordDetailDialog extends JDialog {
 
         boolean confirmed = CopyConfirmDialog.showConfirmDialog(this, contentType);
         if (confirmed) {
-            ClipboardUtil.copyToClipboard(content);
+            ClipboardUtil.ContentType type = "密码".equals(contentType)
+                    ? ClipboardUtil.ContentType.PASSWORD
+                    : ClipboardUtil.ContentType.OTHER;
+            ClipboardUtil.getInstance().copyToClipboard(content, type);
             JOptionPane.showMessageDialog(this,
                     contentType + "已复制到剪贴板",
                     "成功", JOptionPane.INFORMATION_MESSAGE);
