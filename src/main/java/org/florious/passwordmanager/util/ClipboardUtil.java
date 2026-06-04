@@ -115,7 +115,9 @@ public class ClipboardUtil {
 
         // 如果是敏感内容，启动自动清除
         if (contentType == ContentType.PASSWORD) {
-            currentSensitiveContent = text;
+            synchronized (this) {
+                currentSensitiveContent = text;
+            }
             startAutoClear();
         }
     }
@@ -157,7 +159,9 @@ public class ClipboardUtil {
      */
     public void clearClipboard() {
         cancelAutoClear();
-        currentSensitiveContent = null;
+        synchronized (this) {
+            currentSensitiveContent = null;
+        }
 
         // 使用空字符串覆盖剪贴板
         StringSelection emptySelection = new StringSelection("");
@@ -235,7 +239,9 @@ public class ClipboardUtil {
      * @return 如果包含敏感内容返回true
      */
     public boolean hasSensitiveContent() {
-        return currentSensitiveContent != null;
+        synchronized (this) {
+            return currentSensitiveContent != null;
+        }
     }
 
     /**
@@ -273,10 +279,12 @@ public class ClipboardUtil {
      * @return 如果内容未被修改返回true
      */
     public boolean isClipboardUnmodified() {
-        if (currentSensitiveContent == null) {
-            return false;
+        synchronized (this) {
+            if (currentSensitiveContent == null) {
+                return false;
+            }
+            String current = getClipboardText();
+            return currentSensitiveContent.equals(current);
         }
-        String current = getClipboardText();
-        return currentSensitiveContent.equals(current);
     }
 }
