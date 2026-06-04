@@ -1,6 +1,6 @@
 ## 1. 集成 LockPanel 到 MainFrame
 
-- [ ] 1.1 添加 LOCK_PANEL 常量和 LockPanel 字段到 MainFrame
+- [x] 1.1 添加 LOCK_PANEL 常量和 LockPanel 字段到 MainFrame
 - [ ] 1.2 在 setupContentPanel() 中创建 LockPanel 实例并添加到 CardLayout
 - [ ] 1.3 添加 showLockPanel() 方法
 

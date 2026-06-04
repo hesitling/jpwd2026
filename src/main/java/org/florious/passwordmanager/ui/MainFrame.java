@@ -25,6 +25,8 @@ public class MainFrame extends JFrame {
     private JPanel contentPanel;
     private CardLayout cardLayout;
     private VaultPanel vaultPanel;
+    private LockPanel lockPanel;
+    private String lockedUsername;
     
     // 状态栏组件
     private JLabel selectionLabel;
@@ -34,6 +36,7 @@ public class MainFrame extends JFrame {
     private static final String LOGIN_PANEL = "login";
     private static final String REGISTER_PANEL = "register";
     private static final String VAULT_PANEL = "vault";
+    private static final String LOCK_PANEL = "lock";
     
     public MainFrame() {
         this.authService = new AuthService();
