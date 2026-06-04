@@ -293,8 +293,7 @@ public class MainFrame extends JFrame {
     }
     
     private void showSearchDialog() {
-        // TODO: 实现搜索对话框
-        JOptionPane.showMessageDialog(this, "搜索功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+        vaultPanel.focusSearchField();
     }
     
     private void showSettingsDialog() {

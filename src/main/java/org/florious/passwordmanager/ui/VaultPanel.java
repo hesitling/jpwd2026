@@ -216,4 +216,8 @@ public class VaultPanel extends JPanel {
     public PasswordTable getPasswordTable() {
         return passwordTable;
     }
+    
+    public void focusSearchField() {
+        searchField.requestFocusInWindow();
+    }
 }
