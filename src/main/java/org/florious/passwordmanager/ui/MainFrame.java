@@ -288,8 +288,27 @@ public class MainFrame extends JFrame {
     }
     
     private void deleteSelectedPassword() {
-        // TODO: 实现删除密码功能
-        JOptionPane.showMessageDialog(this, "删除密码功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+        PasswordEntry selectedEntry = vaultPanel.getPasswordTable().getSelectedPasswordEntry();
+        if (selectedEntry == null) {
+            JOptionPane.showMessageDialog(this, "请先选择一个密码条目", "提示", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int choice = JOptionPane.showConfirmDialog(this,
+                "确定要删除密码条目 \"" + selectedEntry.getTitle() + "\" 吗？",
+                "确认删除",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        
+        if (choice == JOptionPane.YES_OPTION) {
+            try {
+                vaultService.deletePassword(selectedEntry.getId());
+                refreshData();
+                JOptionPane.showMessageDialog(this, "密码条目已删除", "成功", JOptionPane.INFORMATION_MESSAGE);
+            } catch (VaultService.VaultException e) {
+                JOptionPane.showMessageDialog(this, "删除失败: " + e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
     
     private void showSearchDialog() {
