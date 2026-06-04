@@ -311,6 +311,6 @@ public class SessionManager {
         /**
          * 手动锁定时调用
          */
-        void onSessionLocked();
+        default void onSessionLocked() {}
     }
 }
