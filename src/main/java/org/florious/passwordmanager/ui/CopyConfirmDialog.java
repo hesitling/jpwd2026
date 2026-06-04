@@ -89,7 +89,8 @@ public class CopyConfirmDialog extends JDialog {
                 BorderFactory.createEmptyBorder(8, 10, 8, 10)
         ));
 
-        JLabel tipLabel = new JLabel("💡 提示：剪贴板内容将在30秒后自动清除");
+        int clearDelay = Config.getClipboardClearDelaySeconds();
+        JLabel tipLabel = new JLabel(String.format("💡 提示：剪贴板内容将在%d秒后自动清除", clearDelay));
         tipLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 11));
         tipPanel.add(tipLabel);
 
