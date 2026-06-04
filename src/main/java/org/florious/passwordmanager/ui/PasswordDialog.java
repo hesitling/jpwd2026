@@ -226,7 +226,17 @@ public class PasswordDialog extends JDialog {
     }
     
     private void generatePassword() {
-        PasswordGeneratorDialog dialog = new PasswordGeneratorDialog(this);
+        // 获取拥有者Frame
+        Window owner = getOwner();
+        Frame frame = null;
+        if (owner instanceof Frame) {
+            frame = (Frame) owner;
+        } else {
+            // 如果拥有者不是Frame，使用MainFrame
+            frame = mainFrame;
+        }
+        
+        PasswordGeneratorDialog dialog = new PasswordGeneratorDialog(frame);
         dialog.setVisible(true);
         
         String generatedPassword = dialog.getGeneratedPassword();
