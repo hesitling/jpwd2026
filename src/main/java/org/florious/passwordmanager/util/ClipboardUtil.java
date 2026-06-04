@@ -1,8 +1,10 @@
 package org.florious.passwordmanager.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.datatransfer.*;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.TimerTask;
  * 提供安全的剪贴板操作，支持自动清除和复制历史
  */
 public class ClipboardUtil {
+    private static final Logger logger = LoggerFactory.getLogger(ClipboardUtil.class);
     private static ClipboardUtil instance;
     private final Clipboard clipboard;
     private Timer autoClearTimer;
@@ -252,9 +255,7 @@ public class ClipboardUtil {
      * 通知剪贴板已清除
      */
     private void notifyClipboardCleared() {
-        // 可以通过监听器模式通知UI
-        // 暂时使用简单的输出
-        System.out.println("剪贴板已自动清除");
+        logger.info("剪贴板已自动清除");
     }
 
     /**
