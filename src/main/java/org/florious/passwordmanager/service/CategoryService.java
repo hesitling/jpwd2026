@@ -1,7 +1,9 @@
 package org.florious.passwordmanager.service;
 
 import org.florious.passwordmanager.model.Category;
+import org.florious.passwordmanager.model.PasswordEntry;
 import org.florious.passwordmanager.repository.CategoryRepository;
+import org.florious.passwordmanager.repository.PasswordRepository;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
  */
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final PasswordRepository passwordRepository;
     private final SessionManager sessionManager;
 
     public CategoryService() {
@@ -24,6 +27,7 @@ public class CategoryService {
      */
     public CategoryService(boolean testMode) {
         this.categoryRepository = new CategoryRepository();
+        this.passwordRepository = new PasswordRepository();
         this.sessionManager = SessionManager.getInstance(testMode);
     }
 
@@ -205,6 +209,97 @@ public class CategoryService {
             throw e;
         } catch (Exception e) {
             throw new CategoryException("获取密码条目数量失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 关联密码条目到分类
+     * @param entryId 密码条目ID
+     * @param categoryId 分类ID
+     * @throws CategoryException 如果关联失败
+     */
+    public void associateEntryToCategory(int entryId, int categoryId) throws CategoryException {
+        Session session = getCurrentSession();
+
+        try {
+            // 验证分类存在且属于当前用户
+            Category category = categoryRepository.findById(categoryId);
+            if (category == null || category.getUserId() != session.getUser().getId()) {
+                throw new CategoryException("分类不存在");
+            }
+
+            // 获取密码条目
+            PasswordEntry entry = passwordRepository.findById(entryId);
+            if (entry == null || entry.getUserId() != session.getUser().getId()) {
+                throw new CategoryException("密码条目不存在");
+            }
+
+            // 更新分类关联
+            entry.setCategoryId(categoryId);
+            passwordRepository.update(entry);
+        } catch (CategoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CategoryException("关联密码条目到分类失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 取消密码条目的分类关联
+     * @param entryId 密码条目ID
+     * @throws CategoryException 如果取消关联失败
+     */
+    public void dissociateEntryFromCategory(int entryId) throws CategoryException {
+        Session session = getCurrentSession();
+
+        try {
+            // 获取密码条目
+            PasswordEntry entry = passwordRepository.findById(entryId);
+            if (entry == null || entry.getUserId() != session.getUser().getId()) {
+                throw new CategoryException("密码条目不存在");
+            }
+
+            // 取消分类关联
+            entry.setCategoryId(null);
+            passwordRepository.update(entry);
+        } catch (CategoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CategoryException("取消分类关联失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 取消分类下所有密码条目的关联
+     * @param categoryId 分类ID
+     * @return 取消关联的条目数量
+     * @throws CategoryException 如果操作失败
+     */
+    public int dissociateAllEntriesFromCategory(int categoryId) throws CategoryException {
+        Session session = getCurrentSession();
+
+        try {
+            // 验证分类存在且属于当前用户
+            Category category = categoryRepository.findById(categoryId);
+            if (category == null || category.getUserId() != session.getUser().getId()) {
+                throw new CategoryException("分类不存在");
+            }
+
+            // 获取该分类下的所有密码条目
+            List<PasswordEntry> entries = passwordRepository.findByCategoryId(
+                    categoryId, session.getUser().getId());
+
+            // 取消关联
+            for (PasswordEntry entry : entries) {
+                entry.setCategoryId(null);
+                passwordRepository.update(entry);
+            }
+
+            return entries.size();
+        } catch (CategoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CategoryException("取消分类关联失败: " + e.getMessage(), e);
         }
     }
 
