@@ -130,6 +130,7 @@ public class CategoryComboBox extends JComboBox<CategoryComboBox.CategoryItem> {
 
             if (value instanceof CategoryItem item) {
                 setText(item.name());
+                putClientProperty("CategoryItem", item);
 
                 // 设置工具提示
                 if (item.id() == null) {
@@ -137,6 +138,8 @@ public class CategoryComboBox extends JComboBox<CategoryComboBox.CategoryItem> {
                 } else {
                     list.setToolTipText(item.name() + (item.color() != null ? " (" + item.color() + ")" : ""));
                 }
+            } else {
+                putClientProperty("CategoryItem", null);
             }
 
             return c;
