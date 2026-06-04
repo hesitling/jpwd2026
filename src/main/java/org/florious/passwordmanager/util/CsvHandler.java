@@ -160,53 +160,49 @@ public class CsvHandler {
     }
 
     /**
-     * 读取CSV文件
+     * 读取CSV文件（支持多行字段）
      * @param filePath 文件路径
      * @return CSV记录列表
      * @throws CsvException 如果读取失败
      */
     private List<CsvRecord> readCsvFile(String filePath) throws CsvException {
-        List<CsvRecord> records = new ArrayList<>();
-        
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8))) {
+        try {
+            // 读取整个文件内容
+            String content = new String(java.nio.file.Files.readAllBytes(
+                    java.nio.file.Paths.get(filePath)), StandardCharsets.UTF_8);
             
-            // 读取标题行
-            String headerLine = reader.readLine();
-            if (headerLine == null) {
+            // 去除UTF-8 BOM（如果存在）
+            if (content.startsWith("\uFEFF")) {
+                content = content.substring(1);
+            }
+            
+            // 解析CSV内容
+            List<String[]> allRecords = parseCsvContent(content);
+            
+            if (allRecords.isEmpty()) {
                 throw new CsvException("CSV文件为空");
             }
             
-            // 去除UTF-8 BOM（如果存在）
-            if (headerLine.startsWith("\uFEFF")) {
-                headerLine = headerLine.substring(1);
-            }
-            
-            // 解析标题行
-            String[] headers = parseCsvLine(headerLine);
+            // 第一行是标题
+            String[] headers = allRecords.get(0);
             validateHeaders(headers);
             
-            // 读取数据行
-            String line;
-            int lineNumber = 1;
-            while ((line = reader.readLine()) != null) {
-                lineNumber++;
-                if (line.trim().isEmpty()) {
-                    continue;
+            // 处理数据行
+            List<CsvRecord> records = new ArrayList<>();
+            for (int i = 1; i < allRecords.size(); i++) {
+                String[] values = allRecords.get(i);
+                
+                // 补充缺失的列
+                if (values.length < headers.length) {
+                    String[] paddedValues = new String[headers.length];
+                    System.arraycopy(values, 0, paddedValues, 0, values.length);
+                    for (int j = values.length; j < headers.length; j++) {
+                        paddedValues[j] = "";
+                    }
+                    values = paddedValues;
                 }
                 
                 try {
-                    String[] values = parseCsvLine(line);
-                    if (values.length < headers.length) {
-                        // 补充缺失的列
-                        String[] paddedValues = new String[headers.length];
-                        System.arraycopy(values, 0, paddedValues, 0, values.length);
-                        for (int i = values.length; i < headers.length; i++) {
-                            paddedValues[i] = "";
-                        }
-                        values = paddedValues;
-                    }
-                    
                     CsvRecord record = new CsvRecord(
                         values[0], // title
                         values[1], // username
@@ -217,16 +213,16 @@ public class CsvHandler {
                     );
                     records.add(record);
                 } catch (Exception e) {
-                    throw new CsvException("第" + lineNumber + "行格式错误: " + e.getMessage(), e);
+                    throw new CsvException("第" + (i + 1) + "行格式错误: " + e.getMessage(), e);
                 }
             }
+            
+            return records;
         } catch (CsvException e) {
             throw e;
         } catch (Exception e) {
             throw new CsvException("读取CSV文件失败: " + e.getMessage(), e);
         }
-        
-        return records;
     }
 
     /**
@@ -270,7 +266,7 @@ public class CsvHandler {
     }
 
     /**
-     * 解析CSV行
+     * 解析CSV行（单行版本，保持向后兼容）
      * @param line CSV行
      * @return 字段数组
      */
@@ -308,6 +304,77 @@ public class CsvHandler {
         
         fields.add(currentField.toString());
         return fields.toArray(new String[0]);
+    }
+    
+    /**
+     * 解析CSV内容，支持多行字段（RFC 4180）
+     * @param content CSV内容
+     * @return 记录列表（每个记录是字段数组）
+     * @throws CsvException 如果解析失败
+     */
+    private List<String[]> parseCsvContent(String content) throws CsvException {
+        List<String[]> records = new ArrayList<>();
+        List<String> currentRecord = new ArrayList<>();
+        StringBuilder currentField = new StringBuilder();
+        boolean inQuotes = false;
+        
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            
+            if (inQuotes) {
+                if (c == '"') {
+                    // 检查是否是转义的双引号
+                    if (i + 1 < content.length() && content.charAt(i + 1) == '"') {
+                        currentField.append('"');
+                        i++; // 跳过下一个双引号
+                    } else {
+                        inQuotes = false;
+                    }
+                } else {
+                    currentField.append(c);
+                }
+            } else {
+                if (c == '"') {
+                    inQuotes = true;
+                } else if (c == ',') {
+                    currentRecord.add(currentField.toString());
+                    currentField.setLength(0);
+                } else if (c == '\n' || c == '\r') {
+                    // 处理换行符
+                    currentRecord.add(currentField.toString());
+                    currentField.setLength(0);
+                    
+                    // 跳过 \r\n 中的 \n
+                    if (c == '\r' && i + 1 < content.length() && content.charAt(i + 1) == '\n') {
+                        i++;
+                    }
+                    
+                    // 添加记录
+                    records.add(currentRecord.toArray(new String[0]));
+                    currentRecord.clear();
+                } else {
+                    currentField.append(c);
+                }
+            }
+        }
+        
+        // 添加最后一个字段和记录
+        currentRecord.add(currentField.toString());
+        if (!currentRecord.isEmpty()) {
+            // 检查是否只有空字段
+            boolean hasContent = false;
+            for (String field : currentRecord) {
+                if (!field.trim().isEmpty()) {
+                    hasContent = true;
+                    break;
+                }
+            }
+            if (hasContent) {
+                records.add(currentRecord.toArray(new String[0]));
+            }
+        }
+        
+        return records;
     }
 
     /**
@@ -462,17 +529,19 @@ public class CsvHandler {
             this.notes = decrypted.getNotes();
             
             // 获取分类名称
+            String categoryName = "";
             Integer categoryId = decrypted.getCategoryId();
             if (categoryId != null) {
                 try {
                     Category category = categoryService.getCategory(categoryId);
-                    this.categoryName = category.getName();
+                    if (category != null) {
+                        categoryName = category.getName();
+                    }
                 } catch (Exception e) {
-                    this.categoryName = "";
+                    // 忽略异常，使用空字符串
                 }
-            } else {
-                this.categoryName = "";
             }
+            this.categoryName = categoryName;
         }
 
         public String title() { return title; }
