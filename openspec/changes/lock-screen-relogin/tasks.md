@@ -18,9 +18,9 @@
 
 ## 4. 处理会话事件
 
-- [ ] 4.1 MainFrame 实现 SessionListener 接口
-- [ ] 4.2 实现 onSessionTimeout() 显示 LockPanel
-- [ ] 4.3 实现 onSessionLocked() 显示 LockPanel
+- [x] 4.1 MainFrame 实现 SessionListener 接口
+- [x] 4.2 实现 onSessionTimeout() 显示 LockPanel
+- [x] 4.3 实现 onSessionLocked() 显示 LockPanel
 - [ ] 4.4 在构造函数中注册 SessionListener
 
 ## 5. 测试和验证

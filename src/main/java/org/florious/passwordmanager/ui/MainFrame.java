@@ -15,7 +15,7 @@ import java.awt.event.WindowEvent;
  * 主窗口框架
  * 包含菜单栏、工具栏、状态栏和主内容区域
  */
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements SessionManager.SessionListener {
     private final AuthService authService;
     private final SessionManager sessionManager;
     private final VaultService vaultService;
@@ -432,6 +432,31 @@ public class MainFrame extends JFrame {
     
     public void updateSessionStatus() {
         // SessionStatusBar 会自动更新，无需手动更新
+    }
+    
+    // SessionListener 接口实现
+    @Override
+    public void onSessionCreated(Session session) {
+        // 会话创建时的处理
+    }
+    
+    @Override
+    public void onSessionDestroyed() {
+        // 会话销毁时的处理
+    }
+    
+    @Override
+    public void onSessionTimeout() {
+        SwingUtilities.invokeLater(() -> {
+            showLockPanel();
+        });
+    }
+    
+    @Override
+    public void onSessionLocked() {
+        SwingUtilities.invokeLater(() -> {
+            showLockPanel();
+        });
     }
     
     /**
