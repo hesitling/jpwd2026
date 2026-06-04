@@ -174,6 +174,11 @@ public class CategoryService {
             // 检查是否有密码条目使用该分类
             int entryCount = categoryRepository.countPasswordEntries(categoryId);
 
+            // 先解除关联的密码条目
+            if (entryCount > 0) {
+                dissociateAllEntriesFromCategory(categoryId);
+            }
+
             // 删除分类
             boolean deleted = categoryRepository.delete(categoryId);
             if (!deleted) {
