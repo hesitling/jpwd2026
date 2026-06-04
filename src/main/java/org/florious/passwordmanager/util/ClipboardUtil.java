@@ -148,8 +148,12 @@ public class ClipboardUtil {
             if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 return (String) transferable.getTransferData(DataFlavor.stringFlavor);
             }
-        } catch (UnsupportedFlavorException | IOException e) {
-            // 忽略异常
+        } catch (UnsupportedFlavorException e) {
+            logger.debug("剪贴板不支持文本格式", e);
+        } catch (IOException e) {
+            logger.warn("读取剪贴板内容失败", e);
+        } catch (IllegalStateException e) {
+            logger.debug("剪贴板不可用", e);
         }
         return null;
     }
