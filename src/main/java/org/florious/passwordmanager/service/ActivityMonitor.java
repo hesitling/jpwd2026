@@ -53,7 +53,8 @@ public class ActivityMonitor {
                 // 监控鼠标点击、移动、拖拽
                 if (mouseEvent.getID() == MouseEvent.MOUSE_PRESSED ||
                     mouseEvent.getID() == MouseEvent.MOUSE_CLICKED ||
-                    mouseEvent.getID() == MouseEvent.MOUSE_DRAGGED) {
+                    mouseEvent.getID() == MouseEvent.MOUSE_DRAGGED ||
+                    mouseEvent.getID() == MouseEvent.MOUSE_MOVED) {
                     recordActivity();
                 }
             } else if (event instanceof KeyEvent keyEvent) {
