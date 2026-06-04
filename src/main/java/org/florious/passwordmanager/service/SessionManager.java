@@ -2,6 +2,7 @@ package org.florious.passwordmanager.service;
 
 import org.florious.passwordmanager.crypto.CryptoService;
 import org.florious.passwordmanager.model.User;
+import org.florious.passwordmanager.util.ClipboardUtil;
 import org.florious.passwordmanager.util.Config;
 
 import java.time.Duration;
@@ -20,6 +21,7 @@ public class SessionManager {
     private Session currentSession;
     private final CryptoService cryptoService;
     private final List<SessionListener> listeners;
+    private final ActivityMonitor activityMonitor;
     private Timer timeoutTimer;
     private static final int TIMEOUT_CHECK_INTERVAL = 30000; // 30秒
 
@@ -30,6 +32,7 @@ public class SessionManager {
     private SessionManager(boolean testMode) {
         this.cryptoService = new CryptoService(testMode);
         this.listeners = new CopyOnWriteArrayList<>();
+        this.activityMonitor = ActivityMonitor.getInstance();
     }
 
     /**
@@ -87,11 +90,29 @@ public class SessionManager {
         // 创建新会话
         currentSession = new Session(user, derivedKey);
 
+        // 启动活动监控
+        activityMonitor.start();
+        activityMonitor.resetActivity();
+
         // 启动超时检查定时器
         startTimeoutTimer();
 
         // 通知监听器
         notifySessionCreated();
+    }
+
+    /**
+     * 手动锁定会话
+     * 立即销毁会话并通知监听器
+     */
+    public void lock() {
+        if (currentSession != null) {
+            // 通知锁定
+            notifySessionLocked();
+
+            // 销毁会话
+            destroySession();
+        }
     }
 
     /**
@@ -101,6 +122,12 @@ public class SessionManager {
         if (currentSession != null) {
             // 清除敏感数据
             currentSession.clearSensitiveData();
+
+            // 清除剪贴板中的敏感内容
+            ClipboardUtil.getInstance().clearClipboard();
+
+            // 停止活动监控
+            activityMonitor.stop();
 
             // 停止超时检查定时器
             stopTimeoutTimer();
@@ -143,11 +170,7 @@ public class SessionManager {
         }
 
         long timeoutMillis = Config.getSessionTimeoutMillis();
-        LocalDateTime lastActivity = currentSession.getLastActivityTime();
-        LocalDateTime now = LocalDateTime.now();
-
-        Duration duration = Duration.between(lastActivity, now);
-        return duration.toMillis() >= timeoutMillis;
+        return activityMonitor.getIdleTimeMillis() >= timeoutMillis;
     }
 
     /**
@@ -160,13 +183,9 @@ public class SessionManager {
         }
 
         long timeoutMillis = Config.getSessionTimeoutMillis();
-        LocalDateTime lastActivity = currentSession.getLastActivityTime();
-        LocalDateTime now = LocalDateTime.now();
+        long idleMillis = activityMonitor.getIdleTimeMillis();
 
-        Duration duration = Duration.between(lastActivity, now);
-        long elapsedMillis = duration.toMillis();
-
-        return Math.max(0, (timeoutMillis - elapsedMillis) / 1000);
+        return Math.max(0, (timeoutMillis - idleMillis) / 1000);
     }
 
     /**
@@ -176,6 +195,7 @@ public class SessionManager {
     public void resetTimeout() {
         if (currentSession != null) {
             currentSession.updateActivity();
+            activityMonitor.resetActivity();
         }
     }
 
@@ -260,6 +280,15 @@ public class SessionManager {
     }
 
     /**
+     * 通知会话锁定
+     */
+    private void notifySessionLocked() {
+        for (SessionListener listener : listeners) {
+            listener.onSessionLocked();
+        }
+    }
+
+    /**
      * 会话监听器接口
      */
     public interface SessionListener {
@@ -278,5 +307,10 @@ public class SessionManager {
          * 会话超时时调用
          */
         void onSessionTimeout();
+
+        /**
+         * 手动锁定时调用
+         */
+        default void onSessionLocked() {}
     }
 }

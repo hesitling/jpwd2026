@@ -205,4 +205,12 @@ public class Config {
         int seconds = getInt("clipboard.clear.timeout", 30);
         return seconds * 1000L;
     }
+
+    /**
+     * 获取剪贴板清除延迟时间（秒）
+     * @return 延迟时间（秒）
+     */
+    public static int getClipboardClearDelaySeconds() {
+        return getInt("clipboard.clear.timeout", 30);
+    }
 }

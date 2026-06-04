@@ -11,3 +11,10 @@
 
 - 源文件上限 **400 行**，测试文件上限 **600 行**。
 - 新增或修改文件后，必须确保该文件不超限。
+
+## 日志规范
+
+- 禁止使用 `System.out.println` 或 `System.err.println` 输出日志。
+- 必须使用 SLF4J 日志门面：`org.slf4j.Logger` 和 `org.slf4j.LoggerFactory`。
+- 日志声明：`private static final Logger logger = LoggerFactory.getLogger(ClassName.class);`
+- 示例：`logger.info("用户登录成功: {}", username);`
