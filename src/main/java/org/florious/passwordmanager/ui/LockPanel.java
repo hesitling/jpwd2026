@@ -68,11 +68,7 @@ public class LockPanel extends JPanel {
         gbc.gridy = 2;
         add(lockMessageLabel, gbc);
 
-        // 密码输入面板
-        JPanel inputPanel = new JPanel(new BorderLayout(10, 0));
-        inputPanel.setOpaque(false);
-        inputPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
-
+        // 密码输入
         JLabel passwordLabel = new JLabel("主密码:");
         passwordLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
         passwordLabel.setForeground(Color.WHITE);
