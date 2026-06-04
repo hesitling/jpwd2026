@@ -51,6 +51,9 @@ public class MainFrame extends JFrame implements SessionManager.SessionListener 
         setupContentPanel();
         setupWindowListener();
         
+        // 注册会话监听器
+        sessionManager.addSessionListener(this);
+        
         // 初始显示登录面板
         showLoginPanel();
         
