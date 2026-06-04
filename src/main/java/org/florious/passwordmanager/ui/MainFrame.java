@@ -1,0 +1,376 @@
+package org.florious.passwordmanager.ui;
+
+import org.florious.passwordmanager.service.AuthService;
+import org.florious.passwordmanager.service.SessionManager;
+import org.florious.passwordmanager.service.VaultService;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+/**
+ * 主窗口框架
+ * 包含菜单栏、工具栏、状态栏和主内容区域
+ */
+public class MainFrame extends JFrame {
+    private final AuthService authService;
+    private final SessionManager sessionManager;
+    private final VaultService vaultService;
+    
+    private JMenuBar menuBar;
+    private JToolBar toolBar;
+    private JPanel statusPanel;
+    private JPanel contentPanel;
+    private CardLayout cardLayout;
+    
+    // 状态栏组件
+    private JLabel selectionLabel;
+    private JLabel totalLabel;
+    private JLabel sessionLabel;
+    
+    // 面板名称常量
+    private static final String LOGIN_PANEL = "login";
+    private static final String REGISTER_PANEL = "register";
+    private static final String VAULT_PANEL = "vault";
+    
+    public MainFrame() {
+        this.authService = new AuthService();
+        this.sessionManager = SessionManager.getInstance();
+        this.vaultService = new VaultService();
+        
+        initComponents();
+        setupMenuBar();
+        setupToolBar();
+        setupStatusBar();
+        setupContentPanel();
+        setupWindowListener();
+        
+        // 初始显示登录面板
+        showLoginPanel();
+        
+        // 设置窗口属性
+        setTitle("密码管理器");
+        setSize(1000, 700);
+        setMinimumSize(new Dimension(800, 600));
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    }
+    
+    private void initComponents() {
+        setLayout(new BorderLayout());
+    }
+    
+    private void setupMenuBar() {
+        menuBar = new JMenuBar();
+        
+        // 文件菜单
+        JMenu fileMenu = new JMenu("文件");
+        fileMenu.setMnemonic('F');
+        
+        JMenuItem importItem = new JMenuItem("导入...");
+        importItem.setMnemonic('I');
+        importItem.addActionListener(e -> showImportExportDialog());
+        fileMenu.add(importItem);
+        
+        JMenuItem exportItem = new JMenuItem("导出...");
+        exportItem.setMnemonic('E');
+        exportItem.addActionListener(e -> showImportExportDialog());
+        fileMenu.add(exportItem);
+        
+        fileMenu.addSeparator();
+        
+        JMenuItem exitItem = new JMenuItem("退出");
+        exitItem.setMnemonic('X');
+        exitItem.addActionListener(e -> exitApplication());
+        fileMenu.add(exitItem);
+        
+        menuBar.add(fileMenu);
+        
+        // 编辑菜单
+        JMenu editMenu = new JMenu("编辑");
+        editMenu.setMnemonic('E');
+        
+        JMenuItem addPasswordItem = new JMenuItem("添加密码");
+        addPasswordItem.setMnemonic('A');
+        addPasswordItem.addActionListener(e -> showAddPasswordDialog());
+        editMenu.add(addPasswordItem);
+        
+        JMenuItem editPasswordItem = new JMenuItem("编辑密码");
+        editPasswordItem.setMnemonic('E');
+        editPasswordItem.addActionListener(e -> showEditPasswordDialog());
+        editMenu.add(editPasswordItem);
+        
+        JMenuItem deletePasswordItem = new JMenuItem("删除密码");
+        deletePasswordItem.setMnemonic('D');
+        deletePasswordItem.addActionListener(e -> deleteSelectedPassword());
+        editMenu.add(deletePasswordItem);
+        
+        editMenu.addSeparator();
+        
+        JMenuItem settingsItem = new JMenuItem("设置...");
+        settingsItem.setMnemonic('S');
+        settingsItem.addActionListener(e -> showSettingsDialog());
+        editMenu.add(settingsItem);
+        
+        menuBar.add(editMenu);
+        
+        // 视图菜单
+        JMenu viewMenu = new JMenu("视图");
+        viewMenu.setMnemonic('V');
+        
+        JMenuItem refreshItem = new JMenuItem("刷新");
+        refreshItem.setMnemonic('R');
+        refreshItem.addActionListener(e -> refreshData());
+        viewMenu.add(refreshItem);
+        
+        JMenuItem lockItem = new JMenuItem("锁定");
+        lockItem.setMnemonic('L');
+        lockItem.addActionListener(e -> lockApplication());
+        viewMenu.add(lockItem);
+        
+        menuBar.add(viewMenu);
+        
+        // 帮助菜单
+        JMenu helpMenu = new JMenu("帮助");
+        helpMenu.setMnemonic('H');
+        
+        JMenuItem aboutItem = new JMenuItem("关于");
+        aboutItem.setMnemonic('A');
+        aboutItem.addActionListener(e -> showAboutDialog());
+        helpMenu.add(aboutItem);
+        
+        menuBar.add(helpMenu);
+        
+        setJMenuBar(menuBar);
+    }
+    
+    private void setupToolBar() {
+        toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+        
+        // 添加按钮
+        JButton addButton = createToolBarButton("添加", "添加新密码");
+        addButton.addActionListener(e -> showAddPasswordDialog());
+        toolBar.add(addButton);
+        
+        // 编辑按钮
+        JButton editButton = createToolBarButton("编辑", "编辑选中的密码");
+        editButton.addActionListener(e -> showEditPasswordDialog());
+        toolBar.add(editButton);
+        
+        // 删除按钮
+        JButton deleteButton = createToolBarButton("删除", "删除选中的密码");
+        deleteButton.addActionListener(e -> deleteSelectedPassword());
+        toolBar.add(deleteButton);
+        
+        toolBar.addSeparator();
+        
+        // 搜索按钮
+        JButton searchButton = createToolBarButton("搜索", "搜索密码");
+        searchButton.addActionListener(e -> showSearchDialog());
+        toolBar.add(searchButton);
+        
+        toolBar.addSeparator();
+        
+        // 导入按钮
+        JButton importButton = createToolBarButton("导入", "导入CSV文件");
+        importButton.addActionListener(e -> showImportExportDialog());
+        toolBar.add(importButton);
+        
+        // 导出按钮
+        JButton exportButton = createToolBarButton("导出", "导出CSV文件");
+        exportButton.addActionListener(e -> showImportExportDialog());
+        toolBar.add(exportButton);
+        
+        toolBar.addSeparator();
+        
+        // 生成密码按钮
+        JButton generateButton = createToolBarButton("生成密码", "打开密码生成器");
+        generateButton.addActionListener(e -> showPasswordGenerator());
+        toolBar.add(generateButton);
+        
+        add(toolBar, BorderLayout.NORTH);
+    }
+    
+    private JButton createToolBarButton(String text, String toolTip) {
+        JButton button = new JButton(text);
+        button.setToolTipText(toolTip);
+        button.setFocusPainted(false);
+        return button;
+    }
+    
+    private void setupStatusBar() {
+        statusPanel = new JPanel(new BorderLayout());
+        statusPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        
+        // 左侧：选择信息和总计信息
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        selectionLabel = new JLabel("选中: 0");
+        totalLabel = new JLabel("总计: 0");
+        leftPanel.add(selectionLabel);
+        leftPanel.add(totalLabel);
+        
+        // 右侧：会话状态
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        sessionLabel = new JLabel("会话状态: 未登录");
+        rightPanel.add(sessionLabel);
+        
+        statusPanel.add(leftPanel, BorderLayout.WEST);
+        statusPanel.add(rightPanel, BorderLayout.EAST);
+        
+        add(statusPanel, BorderLayout.SOUTH);
+    }
+    
+    private void setupContentPanel() {
+        cardLayout = new CardLayout();
+        contentPanel = new JPanel(cardLayout);
+        
+        // 创建各个面板
+        LoginPanel loginPanel = new LoginPanel(this);
+        RegisterPanel registerPanel = new RegisterPanel(this);
+        VaultPanel vaultPanel = new VaultPanel(this);
+        
+        contentPanel.add(loginPanel, LOGIN_PANEL);
+        contentPanel.add(registerPanel, REGISTER_PANEL);
+        contentPanel.add(vaultPanel, VAULT_PANEL);
+        
+        add(contentPanel, BorderLayout.CENTER);
+    }
+    
+    private void setupWindowListener() {
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exitApplication();
+            }
+        });
+    }
+    
+    // 面板切换方法
+    public void showLoginPanel() {
+        cardLayout.show(contentPanel, LOGIN_PANEL);
+        updateSessionStatus();
+    }
+    
+    public void showRegisterPanel() {
+        cardLayout.show(contentPanel, REGISTER_PANEL);
+    }
+    
+    public void showVaultPanel() {
+        cardLayout.show(contentPanel, VAULT_PANEL);
+        refreshData();
+    }
+    
+    // 对话框显示方法
+    private void showImportExportDialog() {
+        ImportExportDialog dialog = new ImportExportDialog(this);
+        dialog.setVisible(true);
+    }
+    
+    private void showAddPasswordDialog() {
+        // TODO: 实现添加密码对话框
+        JOptionPane.showMessageDialog(this, "添加密码功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void showEditPasswordDialog() {
+        // TODO: 实现编辑密码对话框
+        JOptionPane.showMessageDialog(this, "编辑密码功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void deleteSelectedPassword() {
+        // TODO: 实现删除密码功能
+        JOptionPane.showMessageDialog(this, "删除密码功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void showSearchDialog() {
+        // TODO: 实现搜索对话框
+        JOptionPane.showMessageDialog(this, "搜索功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void showSettingsDialog() {
+        // TODO: 实现设置对话框
+        JOptionPane.showMessageDialog(this, "设置功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void showPasswordGenerator() {
+        PasswordGeneratorDialog dialog = new PasswordGeneratorDialog(this);
+        dialog.setVisible(true);
+    }
+    
+    private void showAboutDialog() {
+        String message = "密码管理器 v1.0\n\n" +
+                "一个安全的密码管理应用程序\n" +
+                "使用Java Swing开发";
+        JOptionPane.showMessageDialog(this, message, "关于", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    // 业务方法
+    public AuthService getAuthService() {
+        return authService;
+    }
+    
+    public SessionManager getSessionManager() {
+        return sessionManager;
+    }
+    
+    public VaultService getVaultService() {
+        return vaultService;
+    }
+    
+    public void refreshData() {
+        // 刷新密码列表
+        // TODO: 实现数据刷新
+    }
+    
+    public void lockApplication() {
+        sessionManager.destroySession();
+        showLoginPanel();
+    }
+    
+    public void exitApplication() {
+        int choice = JOptionPane.showConfirmDialog(this, 
+                "确定要退出应用程序吗？", 
+                "确认退出", 
+                JOptionPane.YES_NO_OPTION);
+        
+        if (choice == JOptionPane.YES_OPTION) {
+            sessionManager.destroySession();
+            System.exit(0);
+        }
+    }
+    
+    public void updateSelectionStatus(int selectedCount) {
+        selectionLabel.setText("选中: " + selectedCount);
+    }
+    
+    public void updateTotalStatus(int totalCount) {
+        totalLabel.setText("总计: " + totalCount);
+    }
+    
+    public void updateSessionStatus() {
+        if (sessionManager.hasActiveSession()) {
+            long remainingSeconds = sessionManager.getSessionRemainingSeconds();
+            sessionLabel.setText(String.format("会话状态: 已登录 (剩余 %d 秒)", remainingSeconds));
+        } else {
+            sessionLabel.setText("会话状态: 未登录");
+        }
+    }
+    
+    /**
+     * 启动应用程序
+     */
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // 设置系统外观
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                // 使用默认外观
+            }
+            
+            MainFrame frame = new MainFrame();
+            frame.setVisible(true);
+        });
+    }
+}
