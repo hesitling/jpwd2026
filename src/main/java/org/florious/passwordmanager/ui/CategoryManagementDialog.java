@@ -185,7 +185,10 @@ public class CategoryManagementDialog extends JDialog {
             return;
         }
 
-        int categoryId = (int) tableModel.getValueAt(selectedRow, 0);
+        Integer categoryId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        if (categoryId == null) {
+            return;
+        }
         String currentName = (String) tableModel.getValueAt(selectedRow, 1);
         String currentColor = (String) tableModel.getValueAt(selectedRow, 2);
 
@@ -213,9 +216,16 @@ public class CategoryManagementDialog extends JDialog {
             return;
         }
 
-        int categoryId = (int) tableModel.getValueAt(selectedRow, 0);
+        Integer categoryId = (Integer) tableModel.getValueAt(selectedRow, 0);
         String categoryName = (String) tableModel.getValueAt(selectedRow, 1);
-        int entryCount = (int) tableModel.getValueAt(selectedRow, 3);
+        Integer entryCount = (Integer) tableModel.getValueAt(selectedRow, 3);
+
+        if (categoryId == null) {
+            return;
+        }
+        if (entryCount == null) {
+            entryCount = 0;
+        }
 
         String message;
         if (entryCount > 0) {
