@@ -8,9 +8,9 @@
 
 ## 2. 修改 PasswordTable 显示分类名称
 
-- [ ] 2.1 修改 PasswordTableModel.getValueAt() 方法，查询 CategoryService 获取分类名称
-- [ ] 2.2 实现分类名称缓存，避免重复查询
-- [ ] 2.3 处理分类不存在的情况（显示"未分类"）
+- [x] 2.1 修改 PasswordTableModel.getValueAt() 方法，查询 CategoryService 获取分类名称
+- [x] 2.2 实现分类名称缓存，避免重复查询
+- [x] 2.3 处理分类不存在的情况（显示"未分类"）
 
 ## 3. 连接 MainFrame 的菜单和工具栏功能
 

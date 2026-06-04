@@ -1,6 +1,8 @@
 package org.florious.passwordmanager.ui;
 
+import org.florious.passwordmanager.model.Category;
 import org.florious.passwordmanager.model.PasswordEntry;
+import org.florious.passwordmanager.service.CategoryService;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -8,7 +10,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 密码表格组件
@@ -17,12 +21,16 @@ import java.util.List;
 public class PasswordTable extends JTable {
     private final MainFrame mainFrame;
     private final PasswordTableModel tableModel;
+    private final CategoryService categoryService;
     private List<PasswordEntry> passwordEntries;
+    private Map<Integer, String> categoryNameCache;
     
     public PasswordTable(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         this.passwordEntries = new ArrayList<>();
         this.tableModel = new PasswordTableModel();
+        this.categoryService = new CategoryService();
+        this.categoryNameCache = new HashMap<>();
         
         setModel(tableModel);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -65,8 +73,21 @@ public class PasswordTable extends JTable {
     
     public void setPasswordEntries(List<PasswordEntry> entries) {
         this.passwordEntries = entries;
+        refreshCategoryNameCache();
         tableModel.fireTableDataChanged();
         updateSelectionStatus();
+    }
+    
+    private void refreshCategoryNameCache() {
+        categoryNameCache.clear();
+        try {
+            List<Category> categories = categoryService.getAllCategories();
+            for (Category category : categories) {
+                categoryNameCache.put(category.getId(), category.getName());
+            }
+        } catch (CategoryService.CategoryException e) {
+            // 加载失败时缓存为空，显示"未分类"
+        }
     }
     
     public PasswordEntry getSelectedPasswordEntry() {
@@ -143,7 +164,11 @@ public class PasswordTable extends JTable {
                 case 2: // URL
                     return entry.getUrl();
                 case 3: // 分类
-                    return entry.getCategoryId() != null ? "分类" : "未分类"; // TODO: 显示分类名称
+                    Integer categoryId = entry.getCategoryId();
+                    if (categoryId == null) {
+                        return "未分类";
+                    }
+                    return categoryNameCache.getOrDefault(categoryId, "未分类");
                 case 4: // 更新时间
                     return entry.getUpdatedAt() != null ? entry.getUpdatedAt().format(formatter) : "";
                 default:
