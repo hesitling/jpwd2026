@@ -2,6 +2,7 @@ package org.florious.passwordmanager.service;
 
 import org.florious.passwordmanager.crypto.CryptoService;
 import org.florious.passwordmanager.model.User;
+import org.florious.passwordmanager.util.ClipboardUtil;
 import org.florious.passwordmanager.util.Config;
 
 import java.time.Duration;
@@ -121,6 +122,9 @@ public class SessionManager {
         if (currentSession != null) {
             // 清除敏感数据
             currentSession.clearSensitiveData();
+
+            // 清除剪贴板中的敏感内容
+            ClipboardUtil.getInstance().clearClipboard();
 
             // 停止活动监控
             activityMonitor.stop();
