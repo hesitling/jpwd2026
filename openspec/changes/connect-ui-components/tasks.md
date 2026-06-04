@@ -29,9 +29,9 @@
 
 ## 5. 实现数据刷新功能
 
-- [ ] 5.1 修改 refreshData() 方法，调用 VaultPanel 的 refresh() 方法
-- [ ] 5.2 实现分类树的刷新
-- [ ] 5.3 在状态栏显示刷新结果
+- [x] 5.1 修改 refreshData() 方法，调用 VaultPanel 的 refresh() 方法
+- [x] 5.2 实现分类树的刷新
+- [x] 5.3 在状态栏显示刷新结果
 
 ## 6. 集成 SessionStatusBar
 

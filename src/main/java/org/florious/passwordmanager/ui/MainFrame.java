@@ -350,8 +350,9 @@ public class MainFrame extends JFrame {
     }
     
     public void refreshData() {
-        // 刷新密码列表
-        // TODO: 实现数据刷新
+        if (vaultPanel != null) {
+            vaultPanel.refresh();
+        }
     }
     
     public void lockApplication() {
