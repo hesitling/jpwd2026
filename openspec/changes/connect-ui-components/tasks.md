@@ -35,9 +35,9 @@
 
 ## 6. 集成 SessionStatusBar
 
-- [ ] 6.1 在 MainFrame 的状态栏中添加 SessionStatusBar 组件
-- [ ] 6.2 实现会话状态的实时更新
-- [ ] 6.3 实现锁定功能的连接
+- [x] 6.1 在 MainFrame 的状态栏中添加 SessionStatusBar 组件
+- [x] 6.2 实现会话状态的实时更新
+- [x] 6.3 实现锁定功能的连接
 
 ## 7. 测试和验证
 

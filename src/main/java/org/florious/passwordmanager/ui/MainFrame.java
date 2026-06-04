@@ -29,7 +29,6 @@ public class MainFrame extends JFrame {
     // 状态栏组件
     private JLabel selectionLabel;
     private JLabel totalLabel;
-    private JLabel sessionLabel;
     
     // 面板名称常量
     private static final String LOGIN_PANEL = "login";
@@ -202,6 +201,8 @@ public class MainFrame extends JFrame {
         return button;
     }
     
+    private SessionStatusBar sessionStatusBar;
+    
     private void setupStatusBar() {
         statusPanel = new JPanel(new BorderLayout());
         statusPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
@@ -213,13 +214,11 @@ public class MainFrame extends JFrame {
         leftPanel.add(selectionLabel);
         leftPanel.add(totalLabel);
         
-        // 右侧：会话状态
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        sessionLabel = new JLabel("会话状态: 未登录");
-        rightPanel.add(sessionLabel);
+        // 右侧：会话状态栏
+        sessionStatusBar = new SessionStatusBar(sessionManager);
         
         statusPanel.add(leftPanel, BorderLayout.WEST);
-        statusPanel.add(rightPanel, BorderLayout.EAST);
+        statusPanel.add(sessionStatusBar, BorderLayout.EAST);
         
         add(statusPanel, BorderLayout.SOUTH);
     }
@@ -381,12 +380,7 @@ public class MainFrame extends JFrame {
     }
     
     public void updateSessionStatus() {
-        if (sessionManager.hasActiveSession()) {
-            long remainingSeconds = sessionManager.getSessionRemainingSeconds();
-            sessionLabel.setText(String.format("会话状态: 已登录 (剩余 %d 秒)", remainingSeconds));
-        } else {
-            sessionLabel.setText("会话状态: 未登录");
-        }
+        // SessionStatusBar 会自动更新，无需手动更新
     }
     
     /**
