@@ -15,7 +15,7 @@
 ## 3. 连接 MainFrame 的菜单和工具栏功能
 
 - [x] 3.1 修改 showAddPasswordDialog() 方法，创建并显示 PasswordDialog（添加模式）
-- [ ] 3.2 修改 showEditPasswordDialog() 方法，获取选中的密码条目并显示 PasswordDialog（编辑模式）
+- [x] 3.2 修改 showEditPasswordDialog() 方法，获取选中的密码条目并显示 PasswordDialog（编辑模式）
 - [ ] 3.3 修改 showSettingsDialog() 方法，创建并显示 SettingsDialog
 - [ ] 3.4 修改 showSearchDialog() 方法，将焦点设置到 VaultPanel 的搜索框
 - [ ] 3.5 修改 PasswordTable 的双击事件，显示 PasswordDetailDialog

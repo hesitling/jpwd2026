@@ -1,5 +1,6 @@
 package org.florious.passwordmanager.ui;
 
+import org.florious.passwordmanager.model.PasswordEntry;
 import org.florious.passwordmanager.service.AuthService;
 import org.florious.passwordmanager.service.SessionManager;
 import org.florious.passwordmanager.service.VaultService;
@@ -276,8 +277,14 @@ public class MainFrame extends JFrame {
     }
     
     private void showEditPasswordDialog() {
-        // TODO: 实现编辑密码对话框
-        JOptionPane.showMessageDialog(this, "编辑密码功能待实现", "提示", JOptionPane.INFORMATION_MESSAGE);
+        PasswordEntry selectedEntry = vaultPanel.getPasswordTable().getSelectedPasswordEntry();
+        if (selectedEntry == null) {
+            JOptionPane.showMessageDialog(this, "请先选择一个密码条目", "提示", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        PasswordDialog dialog = new PasswordDialog(this, PasswordDialog.DialogMode.EDIT, selectedEntry);
+        dialog.setVisible(true);
+        refreshData();
     }
     
     private void deleteSelectedPassword() {
