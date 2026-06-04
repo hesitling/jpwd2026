@@ -23,6 +23,7 @@ public class SessionStatusBar extends JPanel {
         this.sessionManager = sessionManager;
         initComponents();
         startUpdateTimer();
+        updateStatus(); // 立即同步状态
     }
 
     /**
