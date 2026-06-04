@@ -20,6 +20,7 @@ public class SessionManager {
     private Session currentSession;
     private final CryptoService cryptoService;
     private final List<SessionListener> listeners;
+    private final ActivityMonitor activityMonitor;
     private Timer timeoutTimer;
     private static final int TIMEOUT_CHECK_INTERVAL = 30000; // 30秒
 
@@ -30,6 +31,7 @@ public class SessionManager {
     private SessionManager(boolean testMode) {
         this.cryptoService = new CryptoService(testMode);
         this.listeners = new CopyOnWriteArrayList<>();
+        this.activityMonitor = ActivityMonitor.getInstance();
     }
 
     /**
@@ -87,6 +89,10 @@ public class SessionManager {
         // 创建新会话
         currentSession = new Session(user, derivedKey);
 
+        // 启动活动监控
+        activityMonitor.start();
+        activityMonitor.resetActivity();
+
         // 启动超时检查定时器
         startTimeoutTimer();
 
@@ -101,6 +107,9 @@ public class SessionManager {
         if (currentSession != null) {
             // 清除敏感数据
             currentSession.clearSensitiveData();
+
+            // 停止活动监控
+            activityMonitor.stop();
 
             // 停止超时检查定时器
             stopTimeoutTimer();
@@ -143,11 +152,7 @@ public class SessionManager {
         }
 
         long timeoutMillis = Config.getSessionTimeoutMillis();
-        LocalDateTime lastActivity = currentSession.getLastActivityTime();
-        LocalDateTime now = LocalDateTime.now();
-
-        Duration duration = Duration.between(lastActivity, now);
-        return duration.toMillis() >= timeoutMillis;
+        return activityMonitor.getIdleTimeMillis() >= timeoutMillis;
     }
 
     /**
@@ -160,13 +165,9 @@ public class SessionManager {
         }
 
         long timeoutMillis = Config.getSessionTimeoutMillis();
-        LocalDateTime lastActivity = currentSession.getLastActivityTime();
-        LocalDateTime now = LocalDateTime.now();
+        long idleMillis = activityMonitor.getIdleTimeMillis();
 
-        Duration duration = Duration.between(lastActivity, now);
-        long elapsedMillis = duration.toMillis();
-
-        return Math.max(0, (timeoutMillis - elapsedMillis) / 1000);
+        return Math.max(0, (timeoutMillis - idleMillis) / 1000);
     }
 
     /**
@@ -176,6 +177,7 @@ public class SessionManager {
     public void resetTimeout() {
         if (currentSession != null) {
             currentSession.updateActivity();
+            activityMonitor.resetActivity();
         }
     }
 
