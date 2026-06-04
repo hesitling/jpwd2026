@@ -188,8 +188,16 @@ public class ClipboardUtil {
         autoClearTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                clearClipboard();
-                notifyClipboardCleared();
+                // 检查剪贴板内容是否仍是我们设置的
+                if (isClipboardUnmodified()) {
+                    clearClipboard();
+                    notifyClipboardCleared();
+                } else {
+                    logger.debug("剪贴板内容已被外部程序修改，跳过自动清除");
+                    synchronized (ClipboardUtil.this) {
+                        currentSensitiveContent = null;
+                    }
+                }
             }
         }, autoClearDelaySeconds * 1000L);
     }
@@ -265,13 +273,11 @@ public class ClipboardUtil {
     }
 
     /**
-     * 监听剪贴板内容变化
-     * 当外部程序修改剪贴板时取消自动清除
+     * 检查自动清除是否激活
+     * @return 如果自动清除定时器正在运行返回true
      */
-    public void startMonitoring() {
-        // Java 不直接支持剪贴板变化监听
-        // 可以通过定期检查实现，但会增加资源消耗
-        // 这里使用简单的实现：在复制时记录内容，清除时验证
+    public boolean isAutoClearActive() {
+        return autoClearTimer != null;
     }
 
     /**
