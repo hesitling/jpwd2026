@@ -11,6 +11,7 @@ public class LockPanel extends JPanel {
     private JPasswordField passwordField;
     private JButton unlockButton;
     private JLabel statusLabel;
+    private JLabel welcomeLabel;
     private UnlockCallback unlockCallback;
 
     /**
@@ -61,12 +62,12 @@ public class LockPanel extends JPanel {
         gbc.gridy = 1;
         add(titleLabel, gbc);
 
-        // 锁定提示
-        JLabel lockMessageLabel = new JLabel("应用程序已锁定");
-        lockMessageLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
-        lockMessageLabel.setForeground(new Color(180, 180, 180));
+        // 欢迎信息
+        welcomeLabel = new JLabel("应用程序已锁定");
+        welcomeLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
+        welcomeLabel.setForeground(new Color(180, 180, 180));
         gbc.gridy = 2;
-        add(lockMessageLabel, gbc);
+        add(welcomeLabel, gbc);
 
         // 密码输入
         JLabel passwordLabel = new JLabel("主密码:");
@@ -171,6 +172,18 @@ public class LockPanel extends JPanel {
         statusLabel.setForeground(new Color(100, 255, 100));
     }
 
+    /**
+     * 设置欢迎信息
+     * @param username 用户名
+     */
+    public void setWelcomeMessage(String username) {
+        if (username != null && !username.isEmpty()) {
+            welcomeLabel.setText("欢迎回来，" + username);
+        } else {
+            welcomeLabel.setText("应用程序已锁定");
+        }
+    }
+    
     /**
      * 设置解锁回调
      * @param callback 回调对象

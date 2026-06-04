@@ -11,7 +11,7 @@
 
 ## 3. 实现解锁逻辑
 
-- [ ] 3.1 在 LockPanel 中显示欢迎信息（欢迎回来，{username}）
+- [x] 3.1 在 LockPanel 中显示欢迎信息（欢迎回来，{username}）
 - [x] 3.2 设置 LockPanel 的 UnlockCallback 实现
 - [x] 3.3 解锁成功时调用 authService.login() 并显示 VaultPanel
 - [x] 3.4 解锁失败时显示错误信息

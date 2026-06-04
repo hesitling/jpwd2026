@@ -275,6 +275,7 @@ public class MainFrame extends JFrame {
     
     public void showLockPanel() {
         cardLayout.show(contentPanel, LOCK_PANEL);
+        lockPanel.setWelcomeMessage(lockedUsername);
         lockPanel.clearPassword();
         lockPanel.requestPasswordFocus();
     }
