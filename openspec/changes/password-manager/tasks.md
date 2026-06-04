@@ -55,7 +55,7 @@
 - [x] 7.2 实现分类关联方法（关联密码条目到分类、取消关联）
 - [x] 7.3 实现分类过滤方法（按分类过滤密码条目）
 - [x] 7.4 实现分类管理界面CategoryManagementDialog
-- [ ] 7.5 实现分类选择组件CategoryComboBox
+- [x] 7.5 实现分类选择组件CategoryComboBox
 
 ## 8. 会话管理
 
