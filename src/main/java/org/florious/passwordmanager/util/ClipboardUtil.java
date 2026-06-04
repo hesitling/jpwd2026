@@ -17,6 +17,8 @@ public class ClipboardUtil {
     private static ClipboardUtil instance;
     private final Clipboard clipboard;
     private Timer autoClearTimer;
+    private long autoClearStartTime;
+    private int autoClearDelaySeconds;
     private String currentSensitiveContent;
     private final List<CopyRecord> copyHistory;
     private static final int MAX_HISTORY_SIZE = 50;
@@ -169,11 +171,12 @@ public class ClipboardUtil {
     private void startAutoClear() {
         cancelAutoClear();
 
-        int clearDelaySeconds = Config.getClipboardClearDelaySeconds();
-        if (clearDelaySeconds <= 0) {
+        autoClearDelaySeconds = Config.getClipboardClearDelaySeconds();
+        if (autoClearDelaySeconds <= 0) {
             return;
         }
 
+        autoClearStartTime = System.currentTimeMillis();
         autoClearTimer = new Timer("ClipboardAutoClear", true);
         autoClearTimer.schedule(new TimerTask() {
             @Override
@@ -181,7 +184,7 @@ public class ClipboardUtil {
                 clearClipboard();
                 notifyClipboardCleared();
             }
-        }, clearDelaySeconds * 1000L);
+        }, autoClearDelaySeconds * 1000L);
     }
 
     /**
@@ -191,6 +194,7 @@ public class ClipboardUtil {
         if (autoClearTimer != null) {
             autoClearTimer.cancel();
             autoClearTimer = null;
+            autoClearStartTime = 0;
         }
     }
 
@@ -236,8 +240,12 @@ public class ClipboardUtil {
      * @return 剩余时间，如果没有自动清除返回-1
      */
     public long getAutoClearRemainingMillis() {
-        // 此方法需要更复杂的实现来跟踪定时器状态
-        return autoClearTimer != null ? 0 : -1;
+        if (autoClearTimer == null || autoClearStartTime == 0) {
+            return -1;
+        }
+        long elapsed = System.currentTimeMillis() - autoClearStartTime;
+        long total = autoClearDelaySeconds * 1000L;
+        return Math.max(0, total - elapsed);
     }
 
     /**
