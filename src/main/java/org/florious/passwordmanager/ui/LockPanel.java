@@ -1,7 +1,5 @@
 package org.florious.passwordmanager.ui;
 
-import org.florious.passwordmanager.service.SessionManager;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -10,7 +8,6 @@ import java.awt.*;
  * 当会话超时或用户手动锁定时显示
  */
 public class LockPanel extends JPanel {
-    private final SessionManager sessionManager;
     private JPasswordField passwordField;
     private JButton unlockButton;
     private JLabel statusLabel;
@@ -33,8 +30,7 @@ public class LockPanel extends JPanel {
         void onUnlockFailure(String message);
     }
 
-    public LockPanel(SessionManager sessionManager) {
-        this.sessionManager = sessionManager;
+    public LockPanel() {
         initComponents();
     }
 
