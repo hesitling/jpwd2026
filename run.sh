@@ -10,6 +10,22 @@ cd "$SCRIPT_DIR"
 export JAVA_HOME="$SCRIPT_DIR/jbr"
 MVN="$SCRIPT_DIR/maven/lib/maven3/bin/mvn"
 
+# 预检查 JBR 和 Maven 路径
+if [ ! -d "$JAVA_HOME" ]; then
+  echo "ERROR: Java runtime directory not found at $JAVA_HOME" >&2
+  exit 1
+fi
+
+if [ ! -x "$JAVA_HOME/bin/java" ]; then
+  echo "ERROR: Java executable not found at $JAVA_HOME/bin/java" >&2
+  exit 1
+fi
+
+if [ ! -x "$MVN" ]; then
+  echo "ERROR: Maven not found at $MVN" >&2
+  exit 1
+fi
+
 # 颜色输出
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
