@@ -7,6 +7,7 @@ import org.florious.passwordmanager.service.VaultService;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.util.List;
@@ -25,6 +26,7 @@ public class VaultPanel extends JPanel {
     private JTree categoryTree;
     private PasswordTable passwordTable;
     private JLabel statusLabel;
+    private JButton deleteButton;
     
     public VaultPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -83,17 +85,42 @@ public class VaultPanel extends JPanel {
         categoryTree.setRootVisible(false);
         categoryTree.setShowsRootHandles(true);
         
+        // 设置自定义渲染器和编辑器
+        DefaultTreeCellRenderer renderer = new CategoryTreeCellRenderer();
+        categoryTree.setCellRenderer(renderer);
+        categoryTree.setCellEditor(new CategoryTreeCellEditor(categoryTree, renderer,
+                categoryService, this::updateDeleteButtonState));
+        categoryTree.setEditable(true);
+        
         // 添加选择监听器
         categoryTree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) categoryTree.getLastSelectedPathComponent();
             if (node != null) {
-                String categoryName = node.getUserObject().toString();
-                filterByCategory(categoryName);
+                Object userObject = node.getUserObject();
+                if (userObject instanceof Category cat) {
+                    filterByCategory(cat.getId());
+                } else {
+                    filterByCategory(null);
+                }
             }
+            updateDeleteButtonState();
         });
         
         JScrollPane treeScrollPane = new JScrollPane(categoryTree);
         panel.add(treeScrollPane, BorderLayout.CENTER);
+        
+        // 底部按钮面板
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 2));
+        JButton addButton = new JButton("添加");
+        deleteButton = new JButton("删除");
+        deleteButton.setEnabled(false);
+        
+        addButton.addActionListener(e -> addCategory());
+        deleteButton.addActionListener(e -> deleteCategory());
+        
+        buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
         
         return panel;
     }
@@ -137,7 +164,7 @@ public class VaultPanel extends JPanel {
         
         List<Category> categories = categoryService.getAllCategories();
         for (Category category : categories) {
-            DefaultMutableTreeNode categoryNode = new DefaultMutableTreeNode(category.getName());
+            DefaultMutableTreeNode categoryNode = new DefaultMutableTreeNode(category);
             root.add(categoryNode);
         }
         
@@ -175,33 +202,28 @@ public class VaultPanel extends JPanel {
         }
     }
     
-    private void filterByCategory(String categoryName) {
-        if (categoryName.equals("所有分类")) {
+    private void filterByCategory(Integer categoryId) {
+        if (categoryId == null) {
             loadPasswordList();
             return;
         }
         
         try {
-            // 查找分类ID
-            List<Category> categories = categoryService.getAllCategories();
-            Integer categoryId = null;
-            for (Category category : categories) {
-                if (category.getName().equals(categoryName)) {
-                    categoryId = category.getId();
-                    break;
-                }
-            }
-            
-            if (categoryId != null) {
-                List<PasswordEntry> entries = vaultService.getPasswordsByCategory(categoryId);
-                passwordTable.setPasswordEntries(entries);
-                updateStatus("显示分类 \"" + categoryName + "\" 的 " + entries.size() + " 个密码条目");
-            } else {
-                updateStatus("未找到分类: " + categoryName);
-            }
+            List<PasswordEntry> entries = vaultService.getPasswordsByCategory(categoryId);
+            passwordTable.setPasswordEntries(entries);
+            updateStatus("显示 " + entries.size() + " 个密码条目");
         } catch (Exception e) {
             updateStatus("按分类筛选失败: " + e.getMessage());
         }
+    }
+    
+    private void updateDeleteButtonState() {
+        if (deleteButton == null) {
+            return;
+        }
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) categoryTree.getLastSelectedPathComponent();
+        boolean isCategoryNode = node != null && node.getUserObject() instanceof Category;
+        deleteButton.setEnabled(isCategoryNode);
     }
     
     private void updateStatus(String message) {
@@ -220,4 +242,66 @@ public class VaultPanel extends JPanel {
     public void focusSearchField() {
         searchField.requestFocusInWindow();
     }
+    
+    /**
+     * 添加分类
+     */
+    private void addCategory() {
+        String name = JOptionPane.showInputDialog(this, "请输入分类名称：", "添加分类",
+                JOptionPane.PLAIN_MESSAGE);
+        if (name == null) {
+            return; // 用户取消
+        }
+        name = name.trim();
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "分类名称不能为空", "错误", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            categoryService.createCategory(name, null);
+            loadCategoryTree();
+            updateStatus("分类 \"" + name + "\" 创建成功");
+        } catch (CategoryService.CategoryException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "创建失败", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "创建分类失败: " + e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    /**
+     * 删除分类
+     */
+    private void deleteCategory() {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) categoryTree.getLastSelectedPathComponent();
+        if (node == null || !(node.getUserObject() instanceof Category category)) {
+            return;
+        }
+        
+        try {
+            int entryCount = categoryService.getPasswordEntryCount(category.getId());
+            String message;
+            if (entryCount > 0) {
+                message = String.format("分类 '%s' 下有 %d 个密码条目，删除后将变为未分类。确定删除？",
+                        category.getName(), entryCount);
+            } else {
+                message = String.format("确定删除分类 '%s'？", category.getName());
+            }
+            
+            int result = JOptionPane.showConfirmDialog(this, message, "确认删除",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (result != JOptionPane.YES_OPTION) {
+                return;
+            }
+            
+            categoryService.deleteCategory(category.getId());
+            loadCategoryTree();
+            updateStatus("分类 \"" + category.getName() + "\" 已删除");
+        } catch (CategoryService.CategoryException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "删除失败", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "删除分类失败: " + e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
 }
